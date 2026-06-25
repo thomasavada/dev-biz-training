@@ -578,13 +578,13 @@
     <section class="sheet" data-sec="Mục 3 · Claude Local">
       <div class="shead reveal" data-d="1">
         <div class="eyebrow">Mục 3 <span class="dim">// 15' · hands-on</span></div>
-        <h2>Claude Local — setup “siêu năng lực”</h2>
+        <h2>Claude Local — <span class="amber">trao quyền</span> cho agent</h2>
       </div>
       <div class="cols">
         <div class="reveal" data-d="2" style="display:flex;flex-direction:column;gap:16px">
           <div class="card">
-            <h3><span class="k" style="color:var(--blueprint)">.env.agent</span> đầy đủ</h3>
-            <p>Skills kết nối <b>Crisp · Support · Ticket · Logging</b>. Key theo <b>level support</b> → mình tự debug bug ở local hoặc qua OpenClaw.</p>
+            <h3>Trao quyền cho agent (có guardrail)</h3>
+            <p>1 <b>IAM key chung</b> trên <b>product staging</b> → assign quyền cơ bản: <b>Google Sheet · Firestore (read) · read logging</b>. Agent có quyền = <b>làm được</b>, vẫn trong guardrail. <span class="k">.env.agent</span> để kết nối Crisp/Slack/Ticket.</p>
           </div>
           <div class="card amber">
             <h3>Agent ≠ Skill</h3>
@@ -592,7 +592,7 @@
           </div>
           <div class="card">
             <h3><span class="n">›</span> Cài plugins &amp; skills</h3>
-            <p><span class="k">/plugin</span> cài plugin (superpowers · code-review…). Skill nội bộ ở <span class="k">.claude/skills/</span> (crisp-reader · avada-tickets…). Chi tiết: 2 slide <b>Toolbox</b>.</p>
+            <p><span class="k">/plugin</span> cài plugin (superpowers · code-review…). Skill nội bộ ở <span class="k">.claude/skills/</span> (custom skills tự viết). Chi tiết: 2 slide <b>Toolbox</b>.</p>
           </div>
         </div>
         <ul class="b reveal" data-d="3">
@@ -620,58 +620,56 @@
           <p><b>superpowers</b> = brainstorming · TDD · systematic-debugging · writing/executing-plans · verification. Đúng kỷ luật Mục 2.</p>
         </div>
         <div class="card">
-          <h3><span class="n">›</span> Loop &amp; Taste</h3>
+          <h3><span class="n">›</span> Build &amp; Iterate</h3>
           <div class="chips">
+            <span class="chip"><b>frontend-design</b></span><span class="chip">skill-creator</span>
             <span class="chip"><b>ralph-loop</b></span><span class="chip"><b>playwright</b></span>
-            <span class="chip">frontend-design</span><span class="chip">skill-creator</span>
             <span class="chip">context7</span>
           </div>
-          <p><span class="k">/goal</span> vòng lặp có exit (Mục 5) · playwright = generator–evaluator tự mở app chấm (Demo 4) · skill-creator tự đóng gói quy trình.</p>
+          <p>frontend-design dựng UI · skill-creator đóng gói quy trình · <span class="k">/goal</span> + ralph-loop lặp có exit · playwright = generator–evaluator (Demo 4) · context7 docs luôn mới.</p>
         </div>
         <div class="card amber">
           <h3><span class="n">›</span> Stack &amp; Guardrail</h3>
           <div class="chips">
-            <span class="chip"><b>firebase</b></span><span class="chip">shopify-ai-toolkit</span>
+            <span class="chip"><b>shopify-ai-toolkit</b></span><span class="chip"><b>firebase</b></span>
             <span class="chip">liquid-skills</span><span class="chip">vercel</span>
             <span class="chip">cloudflare</span><span class="chip">security-guidance</span>
           </div>
-          <p><b>firebase</b> → query Firestore (đúng Demo 2) · shopify + liquid cho theme · security-guidance giữ guardrail.</p>
+          <p><b>shopify-ai-toolkit</b> (quan trọng cho Joy) · firebase → Firestore (Demo 2). MCP: nối <span class="k">shopify-dev-mcp</span> (dev docs) là đủ · security-guidance giữ guardrail.</p>
         </div>
       </div>
     </section>
 
-    <section class="sheet" data-sec="Toolbox · Joy skills">
+    <section class="sheet" data-sec="Toolbox · Custom skills">
       <div class="shead reveal" data-d="1">
-        <div class="eyebrow">Bộ công cụ mình dùng <span class="dim">// skills nội bộ · .env.agent</span></div>
-        <h2>Joy/Avada skills — <span class="amber">siêu năng lực</span> ở local</h2>
-        <div class="sub">Đây chính là <span class="k">.env.agent</span> ở Mục 3: skill kết nối nguồn sự thật → mình tự debug không cần khách.</div>
+        <div class="eyebrow">Bộ công cụ mình dùng <span class="dim">// custom skills · .env.agent</span></div>
+        <h2>Custom skills — <span class="amber">trao quyền</span> ở local</h2>
+        <div class="sub">Skill nội bộ tự viết, kết nối nguồn sự thật → tự debug không cần khách. Chính là <span class="k">.env.agent</span> ở Mục 3 (tên handle giữ nội bộ).</div>
       </div>
       <div class="cols-3 reveal" data-d="2">
         <div class="card amber">
           <h3><span class="n">›</span> Support &amp; Debug</h3>
           <div class="chips">
-            <span class="chip"><b>crisp-reader</b></span><span class="chip"><b>slack-reader</b></span>
-            <span class="chip">avada-tickets</span><span class="chip">gcp-logs</span>
-            <span class="chip">billing-monitor</span>
+            <span class="chip">chat / support</span><span class="chip">ticket</span>
+            <span class="chip">logging</span><span class="chip">cost</span>
           </div>
-          <p>Đọc hội thoại Crisp/Slack · ticket · log production · chi phí GCP → đúng <b>Demo 2</b> (root cause từ nguồn, không login store khách).</p>
+          <p>Custom skill đọc <b>chat support · ticket · logging · chi phí</b> → root cause từ nguồn (Demo 2), không login store khách.</p>
         </div>
         <div class="card">
           <h3><span class="n">›</span> CRM &amp; Task</h3>
           <div class="chips">
-            <span class="chip"><b>twenty-crm</b></span><span class="chip">notion-tasks</span>
-            <span class="chip">joy-my-tasks</span>
+            <span class="chip">CRM merchant</span><span class="chip">task board</span>
           </div>
-          <p>Tra merchant theo Shopify domain · quản lý board Notion · standup cá nhân.</p>
+          <p>Tra merchant theo Shopify domain · quản lý task board · standup cá nhân.</p>
         </div>
         <div class="card">
           <h3><span class="n">›</span> Connectors (MCP)</h3>
           <div class="chips">
             <span class="chip"><b>claude-in-chrome</b></span><span class="chip">chrome-devtools</span>
-            <span class="chip">Firestore</span><span class="chip">Shopify</span>
-            <span class="chip">GitLab MR</span>
+            <span class="chip"><b>shopify-dev-mcp</b></span><span class="chip">Firestore</span>
+            <span class="chip">GitLab</span>
           </div>
-          <p>claude-in-chrome = duyệt web <b>tiết kiệm token</b> (Mục 2). Key theo <b>level support</b> · secret nằm trong <span class="k">.env.agent</span>.</p>
+          <p><b>claude-in-chrome</b> = chrome control + computer use (tiết kiệm token) · <span class="k">shopify-dev-mcp</span> dev docs. Secret trong <span class="k">.env.agent</span>.</p>
         </div>
       </div>
     </section>
@@ -696,7 +694,7 @@
           </div>
           <div class="card">
             <h3><span class="n">›</span> Notion</h3>
-            <p>Ai thích Notion thì <b>kết nối Notion</b> (<span class="k">notion-tasks</span> / API) — đúng như buổi này: agenda + nguồn nằm trên Notion.</p>
+            <p>Ai thích Notion thì <b>kết nối Notion</b> (custom skill / Notion API) — đúng như buổi này: agenda + nguồn nằm trên Notion.</p>
           </div>
         </div>
       </div>
@@ -751,7 +749,7 @@
           </div>
           <div class="card">
             <h3>Tự động hóa thật</h3>
-            <p><b>worker / morning loop</b> chạy nền định kỳ · <span class="k">/loop</span> command (≈ plugin <b>ralph-loop</b>) · gắn vào <span class="k">avada-tickets</span> → mỗi vòng ship 1 ticket Joy.</p>
+            <p><b>worker / morning loop</b> chạy nền định kỳ · <span class="k">/loop</span> command (≈ plugin <b>ralph-loop</b>) · gắn vào <b>ticket system</b> → mỗi vòng ship 1 ticket.</p>
           </div>
         </div>
       </div>
@@ -1118,7 +1116,7 @@
     <section class="sheet" data-sec="Câu chốt">
       <div class="eyebrow reveal" data-d="1">Câu chốt <span class="dim">// killer line</span></div>
       <div class="close-wrap">
-        <h1 class="reveal" data-d="2">Đừng chỉ dạy người dùng <span class="strike">AI giỏi hơn</span> —<br>hãy làm <span class="amber">codebase</span> để cả<br>người-kém-AI cũng <span class="amber">ship được consistent.</span></h1>
+        <h1 class="reveal" data-d="2"><span class="amber">Think bold</span>, đừng <span class="strike">think quick</span>.<br>AI lo phần execute —<br>việc của mình là <span class="amber">dám nghĩ to &amp; nâng tiêu chuẩn.</span></h1>
         <div class="reveal" data-d="4" style="display:flex;align-items:center;gap:16px;margin-top:30px;justify-content:center">
           <div style="background:#fff;padding:10px;border-radius:12px;line-height:0;box-shadow:0 6px 24px rgba(0,0,0,.35)">
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwAQMAAAAEm3vRAAAABlBMVEX7+fIcGBOg4D+GAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABj0lEQVRYhe2YO47DMAxEKbhI6SP4KDmafDQfJUdwmcLQhEPSn8VmgW0pmEWU6DnFSCNStMgdd1yjgrEIRB6rPPX79rCpLTvmx7RUFLx1FCmbPsYhOy7AqtMUOr50WnWvE9ALVt3cyKWWJl1hkTYAr+eM78uSEIdTxfXOzY7iLyMnxJ5bFA/vUXW38i31JMRnDJpbMMtfkQ1TN50JdepK4+76s2NuJAfsDrUyt+xO7RbzhI40rlbBUQ1ty8FUJMmxCmUuhVfB5+yCz/1OiyunYfcWi8CQ7JhheuNk+kOnkdPicOqMGJvdOHEsS1oszKk2qlAtFiV0t/SYRWKi7gF+07SNPXSnxdWrQJXILaXFY1sHmD+pmz2CRI9w0Z0Uh0CEU1tx57b+8cOXA77PfkLrfgFPi/d99V7BWgfqR3pcQ6ftIFNQdLHn37JiftjN0st7Mcf+KO9JcbxQYTXES07H9oJtIyVyDF9e9oKtqzvuLdrUSnbsTvXyzosYu7pL954XR25BjHxpeS3vafEdd/wzPu4iepMgOVglAAAAAElFTkSuQmCC" alt="QR · git repo slide" style="width:120px;height:120px;display:block;image-rendering:pixelated">
