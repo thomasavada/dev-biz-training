@@ -1,0 +1,9 @@
+# keep only the new deck
+.idea/
+original-deck/
+node_modules/
+*.zip
+.DS_Store
+# scaffold — not part of the deck
+index.js
+package.json

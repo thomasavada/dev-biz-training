@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI — how I'm doing it · Joy / Avada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* drafting-paper palette — engineer's red/blue pencil on cream */
+    --paper:#F0EBDD;
+    --paper-2:#F7F3E9;
+    --paper-3:#FBF9F2;
+    --ink:#1C1813;
+    --ink-soft:#4B443A;
+    --ink-faint:#938B7B;
+    --signal:#CE3320;       /* vermilion — red pencil, emphasis */
+    --signal-d:#A2271649;
+    --blueprint:#1C4E6B;    /* blue pencil — structure, code, links */
+    --blueprint-l:#2E6E92;
+    --moss:#3D6B45;         /* go / positive */
+    --ochre:#9A6A18;
+    --rule:#1c181426;
+    --rule-2:#1c181412;
+    --grid:#1C4E6B14;
+    --grid-2:#1C4E6B0a;
+    --display:'Fraunces',Georgia,serif;
+    --body:'Hanken Grotesk',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:#15120C;
+    color:var(--ink);
+    font-family:var(--body);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* ---------- Stage / scaling ---------- */
+  #stage{position:fixed;inset:0;display:grid;place-items:center}
+  #deck{
+    position:relative;
+    width:1280px;height:720px;
+    transform-origin:center center;
+    background:
+      /* warm vignette + drafting grid on cream */
+      radial-gradient(130% 100% at 8% -8%, #FBF9F2 0%, transparent 60%),
+      radial-gradient(120% 100% at 105% 108%, #F7F3E9 0%, transparent 55%),
+      var(--paper);
+    overflow:hidden;
+    box-shadow:0 50px 130px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.25);
+  }
+  /* fine drafting grid + paper grain */
+  #deck::before{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(var(--grid-2) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid-2) 1px,transparent 1px),
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:24px 24px,24px 24px,120px 120px,120px 120px;
+    -webkit-mask-image:radial-gradient(135% 100% at 70% 25%,#000 30%,transparent 92%);
+            mask-image:radial-gradient(135% 100% at 70% 25%,#000 30%,transparent 92%);
+  }
+  /* subtle grain */
+  #deck::after{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+  }
+
+  .sheet{
+    position:absolute;inset:0;z-index:1;
+    padding:60px 76px 70px;
+    display:none;flex-direction:column;
+  }
+  .sheet.active{display:flex}
+  .sheet.active .reveal{animation:rise .58s cubic-bezier(.2,.7,.25,1) both}
+  .sheet.active .reveal[data-d="1"]{animation-delay:.05s}
+  .sheet.active .reveal[data-d="2"]{animation-delay:.13s}
+  .sheet.active .reveal[data-d="3"]{animation-delay:.22s}
+  .sheet.active .reveal[data-d="4"]{animation-delay:.31s}
+  .sheet.active .reveal[data-d="5"]{animation-delay:.40s}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes inkdraw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @media (prefers-reduced-motion:reduce){.sheet.active .reveal{animation:none}}
+
+  /* ---------- drafting chrome (registration marks + title block) ---------- */
+  .regmark{position:absolute;width:16px;height:16px;z-index:2;pointer-events:none;opacity:.55}
+  .regmark::before,.regmark::after{content:"";position:absolute;background:var(--blueprint)}
+  .regmark::before{width:16px;height:1px;top:7.5px}
+  .regmark::after{width:1px;height:16px;left:7.5px}
+  .rm-tl{top:24px;left:24px}.rm-tr{top:24px;right:24px}
+  .rm-bl{bottom:24px;left:24px}.rm-br{bottom:24px;right:24px}
+
+  #titleblock{
+    position:absolute;right:30px;bottom:24px;z-index:5;
+    display:flex;align-items:stretch;
+    border:1px solid var(--rule);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+    color:var(--ink-soft);background:rgba(251,249,242,.6);
+    backdrop-filter:blur(2px);
+  }
+  #titleblock .cell{padding:6px 11px;border-right:1px solid var(--rule);display:flex;align-items:center;gap:7px}
+  #titleblock .cell:last-child{border-right:none}
+  #titleblock .lbl{color:var(--ink-faint);font-size:9px}
+  #titleblock #tb-sec{color:var(--signal);text-transform:uppercase;font-weight:600}
+  #titleblock #tb-num b{color:var(--ink);font-weight:700}
+  .footmark{
+    position:absolute;left:76px;bottom:27px;z-index:5;
+    font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+    letter-spacing:.26em;text-transform:uppercase;
+  }
+  #progress{position:absolute;left:0;top:0;height:3px;width:0;z-index:30;
+    background:var(--signal);transition:width .45s cubic-bezier(.4,0,.1,1)}
+
+  /* ---------- shared atoms ---------- */
+  .eyebrow{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--signal);
+    display:flex;align-items:center;gap:13px;font-weight:600;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--signal)}
+  .eyebrow .dim{color:var(--ink-faint);letter-spacing:.18em;font-weight:500}
+
+  h1{font-family:var(--display);font-weight:600;letter-spacing:-.025em;line-height:1.0;color:var(--ink);font-optical-sizing:auto}
+  h2{font-family:var(--display);font-weight:600;letter-spacing:-.02em;line-height:1.04;color:var(--ink)}
+  .amber,.sig{color:var(--signal)}
+  .blue{color:var(--blueprint)}
+
+  .shead{margin-bottom:26px}
+  .shead h2{font-size:38px;margin-top:14px}
+  .shead .sub{color:var(--ink-soft);font-size:16px;margin-top:11px;max-width:80ch;line-height:1.5}
+
+  .lead{color:var(--ink-soft);font-size:18px;line-height:1.55;font-weight:400}
+
+  /* spec list — red pencil tick */
+  ul.b{list-style:none;display:flex;flex-direction:column;gap:14px}
+  ul.b li{position:relative;padding-left:28px;font-size:16.5px;line-height:1.45;color:var(--ink-soft)}
+  ul.b li::before{
+    content:"";position:absolute;left:0;top:6px;width:13px;height:13px;
+    border:2px solid var(--signal);background:transparent;
+    clip-path:polygon(0 55%,38% 100%,100% 8%,82% 0,36% 66%,14% 42%);
+  }
+  ul.b li b{color:var(--ink);font-weight:700}
+  ul.b li .k{font-family:var(--mono);color:var(--blueprint);font-size:14px;font-weight:500}
+  ul.b li.warn{color:var(--signal)}
+  ul.b li.warn::before{background:var(--signal);clip-path:none;border-radius:2px;top:7px;width:11px;height:11px}
+  ul.b li.warn b{color:var(--signal)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:36px;flex:1;min-height:0}
+  .cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;flex:1;min-height:0}
+
+  /* card — raised paper panel */
+  .card{
+    background:linear-gradient(180deg,var(--paper-3),var(--paper-2));
+    border:1px solid var(--rule);border-radius:3px;
+    padding:21px 23px;display:flex;flex-direction:column;gap:11px;
+    box-shadow:2px 3px 0 rgba(28,24,19,.05);
+    position:relative;
+  }
+  .card h3{
+    font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--blueprint);display:flex;align-items:center;gap:9px;font-weight:600;
+  }
+  .card h3 .n{color:var(--signal);font-weight:700}
+  .card p{font-size:15px;color:var(--ink-soft);line-height:1.5}
+  .card p b{color:var(--ink)}
+  .card.amber{border-color:var(--signal-d);background:linear-gradient(180deg,#FBF3EE,#FAEDE6)}
+  .card.amber h3{color:var(--signal)}
+
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    font-family:var(--mono);font-size:12px;font-weight:500;
+    border:1px solid var(--rule);color:var(--ink-soft);
+    padding:6px 11px;border-radius:2px;background:var(--paper-3);
+  }
+  .chip b{color:var(--signal);font-weight:700}
+
+  /* code — annotated drafting callout */
+  pre{
+    font-family:var(--mono);font-size:13.5px;line-height:1.62;
+    background:#FBF9F2;border:1px solid var(--rule);border-left:3px solid var(--blueprint);
+    border-radius:3px;padding:18px 20px;overflow:hidden;position:relative;color:var(--ink-soft);
+  }
+  pre .tag{position:absolute;top:0;right:0;font-size:10px;letter-spacing:.12em;padding:4px 9px;
+    background:var(--blueprint);color:#FBF9F2;font-family:var(--mono)}
+  .cm{color:var(--ink-faint);font-style:italic}
+  .kw{color:var(--signal)}
+  .fn{color:var(--blueprint)}
+  .st{color:var(--moss)}
+  .pr{color:var(--ink)}
+  .arrow{color:var(--signal)}
+
+  /* ===== TITLE ===== */
+  .title-wrap{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .title-wrap h1{font-size:104px;font-weight:600}
+  .title-wrap .ai{color:var(--signal);font-style:italic;font-weight:500}
+  .title-wrap .dev{color:var(--ink);position:relative}
+  .title-wrap .dev::after{content:"";position:absolute;left:0;right:0;bottom:.1em;height:5px;
+    background:var(--signal);transform-origin:left;animation:inkdraw .8s .5s cubic-bezier(.7,0,.3,1) both}
+  .title-sub{font-family:var(--display);font-size:25px;font-weight:400;color:var(--ink-soft);margin-top:26px;font-style:italic}
+  .title-sub .hl{font-style:normal;font-weight:600;color:var(--ink);background:linear-gradient(transparent 60%,rgba(206,51,32,.22) 60%);padding:0 4px}
+  .title-meta{display:flex;gap:0;margin-top:38px;border:1px solid var(--rule);align-self:flex-start;
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);letter-spacing:.04em}
+  .title-meta span{display:flex;align-items:center;gap:9px;padding:10px 18px;border-right:1px solid var(--rule)}
+  .title-meta span:last-child{border-right:none}
+  .title-meta .dot{width:6px;height:6px;background:var(--signal)}
+
+  /* big quote */
+  .quote-big{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .quote-big blockquote{font-family:var(--display);font-weight:500;font-size:44px;line-height:1.16;
+    letter-spacing:-.02em;max-width:24ch;color:var(--ink)}
+  .quote-big blockquote .hl{color:var(--signal);font-style:italic}
+  .quote-big cite{display:block;margin-top:26px;font-style:normal;font-family:var(--mono);
+    font-size:14px;color:var(--ink-soft);letter-spacing:.06em}
+  .quote-big cite b{color:var(--blueprint)}
+
+  /* agenda */
+  .agenda{display:grid;grid-template-columns:1fr 1fr;gap:4px 44px;flex:1;align-content:center}
+  .arow{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:14px;
+    padding:12px 4px;border-bottom:1px solid var(--rule-2)}
+  .arow .ai-n{font-family:var(--mono);color:var(--signal);font-size:17px;font-weight:700}
+  .arow .ai-t{font-size:16px;color:var(--ink);font-weight:600}
+  .arow .ai-t small{display:block;color:var(--ink-faint);font-size:12px;font-weight:400;
+    font-family:var(--mono);margin-top:3px;letter-spacing:.02em}
+  .arow .ai-m{font-family:var(--mono);font-size:13px;color:var(--ink-soft)}
+
+  /* signature gray box → module drawing */
+  .sig-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px}
+  .sig-head h2{font-size:36px;max-width:20ch;line-height:1.08}
+  .sig-head h2 .amber{color:var(--signal);font-style:italic}
+  .sig-head .note{font-family:var(--mono);font-size:11px;color:var(--ink-faint);text-align:right;letter-spacing:.08em;line-height:1.8}
+  .sig-body{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;flex:1;min-height:0}
+
+  .graybox{position:relative;border:2.5px solid var(--signal);border-radius:4px;
+    display:flex;flex-direction:column;background:var(--paper-3);overflow:hidden;
+    box-shadow:3px 4px 0 rgba(206,51,32,.1)}
+  .graybox .gb-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;
+    color:var(--paper-3);background:var(--signal);padding:7px 14px;font-weight:600;text-transform:uppercase;
+    display:flex;justify-content:space-between;align-items:center}
+  .graybox .gb-label .lock{opacity:.85}
+  .gb-interface{padding:15px 20px 4px;font-family:var(--mono);font-size:13px;line-height:1.65}
+  .gb-interior{margin:10px 14px 14px;border:1.5px dashed var(--ink-faint);border-radius:4px;
+    background:repeating-linear-gradient(135deg,#F2EEE4 0 8px,#EDE8DB 8px 16px);
+    padding:16px 18px;position:relative;flex:1;overflow:hidden}
+  .gb-interior .interior-tag{font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+    color:var(--ink-faint);text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .gb-interior .interior-tag::after{content:"delegate ↓";color:var(--blueprint);margin-left:auto;font-weight:600}
+  .gb-blur{font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--ink-soft);filter:blur(2.6px);user-select:none}
+  .gb-interior::after{content:"AGENT FILLS THIS";position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--blueprint);
+    border:1px solid var(--blueprint);padding:6px 13px;border-radius:3px;background:rgba(251,249,242,.92);white-space:nowrap;font-weight:600}
+
+  .sig-side{display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .sig-row{display:flex;gap:13px;align-items:flex-start}
+  .sig-row .ic{flex:none;width:30px;height:30px;border-radius:3px;border:1px solid var(--rule);
+    background:var(--paper-3);display:grid;place-items:center;font-family:var(--mono);
+    color:var(--blueprint);font-size:15px;font-weight:700}
+  .sig-row .tx{font-size:14.5px;line-height:1.45;color:var(--ink-soft)}
+  .sig-row .tx b{color:var(--ink)}
+  .sig-punch{margin-top:4px;font-family:var(--display);font-size:21px;font-weight:500;line-height:1.3;
+    color:var(--ink);border-left:3px solid var(--signal);padding-left:16px}
+  .sig-punch .amber{color:var(--signal);font-style:italic}
+
+  /* table */
+  table.fm{border-collapse:collapse;width:100%;font-size:14.5px;flex:1}
+  table.fm th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-faint);padding:0 16px 11px;border-bottom:1.5px solid var(--ink);font-weight:600}
+  table.fm td{padding:13px 16px;border-bottom:1px solid var(--rule-2);vertical-align:top;line-height:1.45;color:var(--ink-soft)}
+  table.fm td.skill{font-weight:600;color:var(--ink)}
+  table.fm td.skill .badge{font-family:var(--mono);font-size:10.5px;color:var(--paper-3);background:var(--blueprint);
+    border-radius:2px;padding:3px 9px;display:inline-block;margin-bottom:6px;letter-spacing:.05em;font-weight:600}
+  table.fm tr:last-child td{border-bottom:none}
+  table.fm .n{font-family:var(--mono);color:var(--signal);font-weight:700;width:18px;font-size:16px}
+
+  /* demo */
+  .demo-hero{display:grid;grid-template-columns:auto 1fr;gap:30px;flex:1;align-items:center}
+  .demo-badge{width:152px;height:152px;border-radius:5px;border:2px solid var(--ink);
+    background:var(--paper-3);display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:4px;position:relative;box-shadow:4px 5px 0 rgba(28,24,19,.1)}
+  .demo-badge .dn{font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.24em}
+  .demo-badge .dbig{font-family:var(--display);font-size:80px;font-weight:600;color:var(--signal);line-height:1}
+  .demo-badge.star{border-color:var(--signal)}
+  .demo-badge.star::after{content:"★";position:absolute;top:-14px;right:-12px;font-size:28px;color:var(--signal)}
+  .demo-info{display:flex;flex-direction:column;gap:15px}
+  .demo-info h2{font-size:32px}
+  .demo-pill{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;font-family:var(--mono);
+    font-size:12.5px;color:var(--ink-soft);border:1px solid var(--rule);border-radius:30px;padding:6px 15px;background:var(--paper-3)}
+  .demo-pill .t{color:var(--signal);font-weight:600}
+  .demo-pill b{color:var(--ink)}
+  .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .demo-box{border:1px solid var(--rule);border-radius:3px;padding:15px 17px;background:var(--paper-3)}
+  .demo-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+  .demo-box p{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+  .demo-box p b{color:var(--ink)}
+  .demo-box.proves{border-color:var(--signal-d);background:#FBF3EE}
+  .demo-box.proves .lbl{color:var(--signal)}
+  .demo-fb{font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.04em}
+  .demo-fb b{color:var(--signal)}
+
+  /* closing */
+  .close-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:32px}
+  .close-wrap h1{font-size:58px;max-width:21ch;line-height:1.12;font-weight:600}
+  .close-wrap h1 .strike{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--signal);text-decoration-thickness:3px}
+  .close-wrap h1 .amber{color:var(--signal);font-style:italic}
+  .close-foot{font-family:var(--mono);font-size:13px;color:var(--ink-soft);letter-spacing:.05em;display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+  .close-foot .dot{width:6px;height:6px;background:var(--signal)}
+
+  /* hint */
+  #hint{position:absolute;left:50%;bottom:25px;transform:translateX(-50%);z-index:5;
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.1em;opacity:.7;transition:opacity .5s}
+  #hint.hide{opacity:0}
+  kbd{font-family:var(--mono);border:1px solid var(--rule);border-radius:3px;padding:1px 6px;color:var(--ink-soft);font-size:10px;background:var(--paper-3)}
+  :focus-visible{outline:2px solid var(--blueprint);outline-offset:3px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="deck">
+    <div id="progress"></div>
+    <span class="regmark rm-tl"></span><span class="regmark rm-tr"></span>
+    <span class="regmark rm-bl"></span><span class="regmark rm-br"></span>
+
+    <!-- 1 TITLE -->
+    <section class="sheet active" data-sec="Cover">
+      <div class="eyebrow reveal" data-d="1">Cách mình đang làm việc với AI <span class="dim">// Joy · Avada Dev Team</span></div>
+      <div class="title-wrap">
+        <h1 class="reveal" data-d="2"><span class="ai">AI</span> — <span class="dev">how I'm doing it</span></h1>
+        <div class="title-sub reveal" data-d="3">Workflow thật của mình, cho dev <span class="hl">đã biết nghề</span> — không phải lớp “biết về” AI.</div>
+        <div class="title-meta reveal" data-d="4">
+          <span><span class="dot"></span>90 phút · 1 buổi · hands-on</span>
+          <span><span class="dot"></span>Chạy 2 lần, nội dung GIỐNG HỆT</span>
+          <span><span class="dot"></span>plan → ship bằng commands</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 OPEN / fear -->
+    <section class="sheet" data-sec="Mở màn">
+      <div class="eyebrow reveal" data-d="1">Mở màn <span class="dim">// Tư tưởng nền</span></div>
+      <div class="quote-big">
+        <blockquote class="reveal" data-d="2">“Software fundamentals giờ <span class="hl">quan trọng hơn bao giờ hết.</span>”</blockquote>
+        <div style="display:flex;gap:44px;margin-top:32px;flex-wrap:wrap">
+          <div class="lead reveal" data-d="3" style="max-width:34ch">Skill nền tảng của anh em <b style="color:var(--ink)">không mất giá</b>. AI chạy <b style="color:var(--blueprint)">cực tốt trên codebase tốt</b>, cực tệ trên codebase tệ. Hiểu fundamentals = điều khiển AI giỏi nhất.</div>
+          <div class="lead reveal" data-d="4" style="max-width:30ch;border-left:1px solid var(--rule);padding-left:28px">
+            <span style="font-family:var(--mono);color:var(--signal);font-size:12px;letter-spacing:.12em;font-weight:600">KARPATHY</span><br><br>
+            “You can outsource your thinking, but you <b style="color:var(--ink)">can’t outsource your understanding.</b>”
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 AGENDA -->
+    <section class="sheet" data-sec="Agenda">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Agenda <span class="dim">// 90 phút</span></div>
+        <h2>7 mục — từ <span class="amber">mindset</span> đến <span class="blue">codebase</span></h2>
+      </div>
+      <div class="agenda reveal" data-d="2">
+        <div class="arow"><span class="ai-n">0</span><span class="ai-t">Mở đầu — “Vì sao buổi này”<small>code là sawdust · 3 outcome</small></span><span class="ai-m">5'</span></div>
+        <div class="arow"><span class="ai-n">1</span><span class="ai-t">Mindset — tư duy product<small>không phải execution</small></span><span class="ai-m">15'</span></div>
+        <div class="arow"><span class="ai-n">2</span><span class="ai-t">Claude Code — thói quen vận hành<small>+ live demo · 1 vòng đầy đủ</small></span><span class="ai-m">20'</span></div>
+        <div class="arow"><span class="ai-n">3</span><span class="ai-t">Claude Local — setup “siêu năng lực”<small>hands-on · sub-agent</small></span><span class="ai-m">15'</span></div>
+        <div class="arow"><span class="ai-n">4</span><span class="ai-t">On the go — làm việc mọi nơi<small>OpenClaw / Telegram</small></span><span class="ai-m">5'</span></div>
+        <div class="arow"><span class="ai-n">5</span><span class="ai-t">Nâng cao — goal loops &amp; taste<small>generator–evaluator</small></span><span class="ai-m">10'</span></div>
+        <div class="arow"><span class="ai-n">6</span><span class="ai-t">Agent-friendly codebase<small>web component v4 · 5 nguyên tắc</small></span><span class="ai-m">15'</span></div>
+        <div class="arow"><span class="ai-n">7</span><span class="ai-t">Wrap-up — guardrails &amp; Q&amp;A<small>homework</small></span><span class="ai-m">5'</span></div>
+      </div>
+    </section>
+
+    <!-- 4 MUC 1 MINDSET -->
+    <section class="sheet" data-sec="Mục 1 · Mindset">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 1 <span class="dim">// 15'</span></div>
+        <h2>Mindset — tư duy <span class="amber">product</span>, không phải execution</h2>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li><b>Code là <span class="blue">sawdust</span></b> — mạt cưa rơi ra từ việc mô tả thứ mình muốn. Prompt + product thinking mới là tài sản.</li>
+          <li><b>Mình làm cái chưa làm</b>, không làm lại cái đã làm. Hướng tới thứ mới/khó; cái lặp lại để AI lo.</li>
+          <li><b>Mình dám rewrite</b> thay vì vá víu. Gen code rẻ → viết lại sạch nhiều khi nhanh &amp; tốt hơn.</li>
+        </ul>
+        <ul class="b reveal" data-d="3">
+          <li>Mình giờ như <b>nhạc trưởng / CEO công ty nhỏ</b>: chỉ đạo nhiều agent, review &amp; merge — không gõ tay.</li>
+          <li><b>“fail predictably &gt; succeed unpredictably.”</b> Vứt 80% thử nghiệm. Đo bằng <span class="k">số idea test/tuần</span>, không phải dòng code.</li>
+          <li class="warn"><b>⚠ Context anxiety &amp; AI slop:</b> AI hay tự nhận “xong” khi mới nửa vời → <b style="color:var(--ink)">mình phải verify</b>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4b LEARNING -->
+    <section class="sheet" data-sec="Mục 1 · Learning">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 1 <span class="dim">// mindset · học suốt đời</span></div>
+        <h2>Learning — học cái mình <span class="amber">chưa từng học</span></h2>
+        <div class="sub">Thời AI, learn không chỉ là learn kỹ thuật. Kỹ thuật để AI lo phần lớn → lợi thế nằm ở thứ mình chưa bao giờ học.</div>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li><b>Học rộng ngoài code:</b> <span class="k">business · ecom (sâu) · branding · marketing</span> — hiểu sản phẩm &amp; khách hàng, không chỉ cú pháp.</li>
+          <li>Dev = <b>product thinker / CEO nhỏ</b> (nối Mục 1) → quyết định <b>“làm gì”</b> quan trọng hơn <b>“code thế nào”</b>.</li>
+          <li>Kỹ thuật <b>outsource cho AI được</b> — hiểu business / khách hàng thì <b>không</b>. Đó mới là lợi thế.</li>
+        </ul>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div class="card amber">
+            <h3><span class="n">▶</span> Thói quen xem định kỳ</h3>
+            <p style="font-family:var(--display);font-size:26px;color:var(--ink);line-height:1.1;font-style:italic">@aiDotEngineer</p>
+            <p>Kênh AI Engineer trên YouTube — chính là nguồn các talk <b>Matt Pocock</b> &amp; <b>Karpathy</b> của buổi này.</p>
+          </div>
+          <div class="sig-punch" style="font-size:18px">Karpathy: <span class="amber">“can’t outsource your understanding.”</span> Hiểu business = thứ không thể delegate.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 MUC 2 CLAUDE CODE -->
+    <section class="sheet" data-sec="Mục 2 · Claude Code">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 2 <span class="dim">// 20' · có demo</span></div>
+        <h2>Claude Code — thói quen vận hành</h2>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li><b>Ngôn ngữ:</b> mình luôn dùng English, ngắn gọn. Tiếng Việt / nói dài = tốn token, model lệch.</li>
+          <li><b>Multitask &amp; batch:</b> mình mở nhiều workspace, không làm 1 việc 1 lúc.</li>
+          <li><b>Tiết kiệm token:</b> mình ưu tiên <span class="k">Claude in Chrome</span> / Playwright cho site không cần logout; bật computer use.</li>
+        </ul>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px">
+          <div class="card amber">
+            <h3>Đi đủ vòng bằng commands</h3>
+            <div class="chips">
+              <span class="chip"><b>plan</b></span><span class="chip"><b>implement</b></span>
+              <span class="chip"><b>review</b></span><span class="chip"><b>learn-from-MR</b></span>
+              <span class="chip"><b>commit &amp; push</b></span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Token hygiene</h3>
+            <p><b>Mình clear context</b> giữa các phase, <b>plan mode</b> rồi mới implement. → Live demo: đi trọn 1 vòng trên 1 bug Joy thật.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 MUC 3 CLAUDE LOCAL -->
+    <section class="sheet" data-sec="Mục 3 · Claude Local">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 3 <span class="dim">// 15' · hands-on</span></div>
+        <h2>Claude Local — setup “siêu năng lực”</h2>
+      </div>
+      <div class="cols">
+        <div class="reveal" data-d="2" style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <h3><span class="k" style="color:var(--blueprint)">.env.agent</span> đầy đủ</h3>
+            <p>Skills kết nối <b>Crisp · Support · Ticket · Logging</b>. Key theo <b>level support</b> → mình tự debug bug ở local hoặc qua OpenClaw.</p>
+          </div>
+          <div class="card amber">
+            <h3>Agent ≠ Skill</h3>
+            <p><b>Agent</b> = 1 context window riêng → chạy song song (viết rõ từng agent). <b>Skill</b> = đóng gói 1 quy trình lặp lại (viết khi muốn “đúng gói”).</p>
+          </div>
+        </div>
+        <ul class="b reveal" data-d="3">
+          <li>Mình ưu tiên <b>sub-agent development</b> (super power) → tiết kiệm token.</li>
+          <li>Mình luôn <b>plan mode trước</b> → plan xong → <span class="k">clear</span> → implement (tránh spam context).</li>
+          <li><b>Mình giữ đơn giản:</b> Warp hoặc Zed là đủ; đọc luồng code ở mức cơ bản.</li>
+          <li>Checklist setup <b>gửi trước buổi</b> → ai cũng có môi trường chạy ngay.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7 MUC 4 ON THE GO -->
+    <section class="sheet" data-sec="Mục 4 · On the go">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 4 <span class="dim">// 5'</span></div>
+        <h2>On the go — làm việc mọi nơi</h2>
+      </div>
+      <div class="cols-3 reveal" data-d="2">
+        <div class="card"><h3><span class="n">›</span> OpenClaw</h3><p>Mình cài OpenClaw → điều khiển dev qua <b>Telegram / điện thoại</b>. Conduct on the go.</p></div>
+        <div class="card"><h3><span class="n">›</span> CLI → API</h3><p>Expose <b>Claude CLI thành API</b>. Chậm hơn API trực tiếp (vì trick) nhưng đủ cho on-the-go.</p></div>
+        <div class="card"><h3><span class="n">›</span> Nhiều máy</h3><p>Mình chia <b>nhiều máy chạy song song</b> — Mac mini + Pi… — multitask thật.</p></div>
+      </div>
+    </section>
+
+    <!-- 8 MUC 5 ADVANCED -->
+    <section class="sheet" data-sec="Mục 5 · Nâng cao">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 5 <span class="dim">// 10' · nâng cao</span></div>
+        <h2>Goal loops &amp; Taste</h2>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li>Mình chạy <span class="k">/goal</span> · <span class="k">/ralph-loop</span> với <b>điều kiện exit rõ ràng</b> — lặp đến khi đạt, không vô hạn.</li>
+          <li>Mình mổ xẻ <b>tasteskills</b>: cách nó chấm <span class="k">design · originality · craft · functionality</span> → học cách viết <b>rubric</b> cho output.</li>
+        </ul>
+        <div class="card amber reveal" data-d="3">
+          <h3>Generator – Evaluator</h3>
+          <p>Mình tách 1 agent <b>“critic” khắt khe</b> + Playwright tự mở app chấm điểm.</p>
+          <p style="color:var(--ink-faint)">Đây là cách <b style="color:var(--blueprint)">scale “review”</b> mà không tự lừa mình — self-eval là cái bẫy.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8b RALPH LOOPS -->
+    <section class="sheet" data-sec="Mục 5 · Ralph Loops">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 5 <span class="dim">// ralph loops · talk AI Engineer</span></div>
+        <h2>Ralph Loops — <span class="amber">“dumb loops that ship”</span></h2>
+        <div class="sub">Chris Parsons (Cherrypick). Luận điểm gốc: <b>dumb loop &gt; clever workflow</b> — đừng vội multi-agent orchestration / planning graph (debug hàng tháng).</div>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li><b>1 loop đơn giản</b> (while) xử lý <b>từng ticket end-to-end</b> → thắng cả đống tool chain rườm rà.</li>
+          <li><b>Feedback loop là trái tim:</b> TDD (red→green) + <span class="k">synthetic loop</span> để test ở local, không chờ data production.</li>
+          <li><b>Tự cải thiện:</b> output tốt lên <b>mỗi vòng</b> mà không cần sửa prompt — loop tích lũy.</li>
+        </ul>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px">
+          <div class="card amber">
+            <h3>Validate + Exit</h3>
+            <p><b>Sub-agent “critic”</b> chấm mỗi vòng (= generator–evaluator) · <b>điều kiện dừng rõ</b> cho task mở · canh <span class="k">context rot</span> · vẫn review &amp; verify tay.</p>
+          </div>
+          <div class="card">
+            <h3>Tự động hóa thật</h3>
+            <p><b>worker / morning loop</b> chạy nền định kỳ · <span class="k">/loop</span> command (≈ plugin <b>ralph-loop</b>) · gắn vào <span class="k">avada-tickets</span> → mỗi vòng ship 1 ticket Joy.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 MUC 6 (a) case -->
+    <section class="sheet" data-sec="Mục 6 · Agent-friendly">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 6 <span class="dim">// 15' · case study sống</span></div>
+        <h2>Agent-friendly codebase — <span class="amber">web component v4</span></h2>
+        <div class="sub">Cách mình thiết kế code để agent làm tốt. Case thật: task web component v4.</div>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li>Mình xây <b>design system đủ thành phần</b> → “bảng màu + nốt nhạc” để agent ghép, không tự chế từ đầu mỗi lần.</li>
+          <li>Mình đóng gói thành <b>skill</b> (“thêm 1 UI block”) + <b>agent</b> (context window riêng chạy luồng đó).</li>
+        </ul>
+        <ul class="b reveal" data-d="3">
+          <li>Invoke flow → agent <b>imagine thêm component mới liên tục mà vẫn consistent</b>, vì bị ràng bởi hệ thống có sẵn, không drift.</li>
+          <li>Agent <b>tự <span class="k">vite</span> lên → tự xem → tự sửa UI → tự test lại</b> = vòng generator–evaluator chạy ngay trên UI thật.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 10 MUC 6 (b) 5 principles -->
+    <section class="sheet" data-sec="Mục 6 · 5 nguyên tắc">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 6 <span class="dim">// Nguyên tắc tổng quát (không chỉ UI)</span></div>
+        <h2>5 nguyên tắc mình theo khi làm codebase cho agent</h2>
+      </div>
+      <div class="cols-3 reveal" data-d="2" style="grid-template-rows:1fr 1fr;gap:16px">
+        <div class="card"><h3><span class="n">1</span> Consistency = constraint</h3><p>1 cách làm 1 việc → agent ít sáng tác bậy. AI slop sinh ra ở chỗ cho phép 5 cách.</p></div>
+        <div class="card"><h3><span class="n">2</span> Self-runnable loop</h3><p>Agent tự chạy + tự verify (dev/storybook/test/lint <b>1 lệnh</b>) → tự sửa tới khi xanh.</p></div>
+        <div class="card"><h3><span class="n">3</span> Skill = quy trình · Agent = vai</h3><p>Skill “add-ui-block” cho ai invoke đều cùng chất lượng; agent “ui-builder” chạy song song.</p></div>
+        <div class="card"><h3><span class="n">4</span> Living contract</h3><p>Design system + skill = contract mà generator/evaluator chốt “done” trên đó — không cảm tính.</p></div>
+        <div class="card amber"><h3><span class="n">5</span> Preview = sân chơi evaluator</h3><p>Mỗi component có preview cô lập → evaluator mở từng cái chấm, không cần dựng cả app.</p></div>
+        <div class="card" style="border-style:dashed;justify-content:center;align-items:flex-start">
+          <p style="font-family:var(--display);font-size:18px;color:var(--ink);line-height:1.35;font-style:italic">“Giữ <span class="amber">shape</span>, delegate <span style="color:var(--ink-faint)">ruột</span>.”</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 SIGNATURE -->
+    <section class="sheet" data-sec="Slide đinh">
+      <div class="sig-head reveal" data-d="1">
+        <div>
+          <div class="eyebrow">Slide đinh <span class="dim">// kỹ thuật quan trọng nhất</span></div>
+          <h2 style="margin-top:12px">Design the <span class="amber">interface</span>,<br>delegate the implementation.</h2>
+        </div>
+        <div class="note">deep module · Ousterhout<br>gray box · stay-in-the-loop<br>discountService.js</div>
+      </div>
+      <div class="sig-body">
+        <div class="graybox reveal" data-d="2">
+          <div class="gb-label"><span>MODULE — discountService.js</span><span class="lock">▣ interface locked</span></div>
+          <div class="gb-interface">
+<span class="cm">// mình GIỮ tay: nhỏ, rõ, ổn định</span><br>
+<span class="fn">generateByDiscountFunctionV2</span>({ <span class="pr">shop, program,</span><br>
+&nbsp;&nbsp;<span class="pr">customer, discountParams</span> })<br>
+<span class="arrow">→</span> <span class="kw">Promise</span>&lt;{ priceRule, discount }&gt;
+          </div>
+          <div class="gb-interior">
+            <div class="interior-tag">ruột — agent fill</div>
+            <div class="gb-blur">
+              build metafield V2 · map appliedTo (all / specific / exclude)<br>
+              free-shipping · quantity rules · limit cart value · combinesWith<br>
+              runDiscountMutation → Shopify · branch · branch · branch …
+            </div>
+          </div>
+        </div>
+        <div class="sig-side reveal" data-d="3">
+          <div class="sig-row"><div class="ic">~</div><div class="tx"><b>Mình không burnout</b> — chỉ ôm interface, không đọc từng dòng (trừ tính tiền / billing thì vẫn soi).</div></div>
+          <div class="sig-row"><div class="ic">≠</div><div class="tx"><b>AI ít drift</b> — bị ràng bởi contract, không bịa abstraction lan ra ngoài.</div></div>
+          <div class="sig-row"><div class="ic">◉</div><div class="tx"><b>Test gọn</b> — chấm ở 1 boundary lớn thay vì 20 file vụn. deep &gt; shallow.</div></div>
+          <div class="sig-punch">Mình review chỉ hỏi: <span class="amber">“interface có đổi? output shape đúng?”</span> — không đọc 200 dòng metafield.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 CODE KHONG RE -->
+    <section class="sheet" data-sec="Fundamentals · Code không rẻ">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Software fundamentals <span class="dim">// Matt Pocock</span></div>
+        <h2>Code <span class="amber">KHÔNG</span> rẻ</h2>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li>Trào lưu <b>“viết spec → AI gen → lỗi thì sửa spec, đừng nhìn code”</b> = <span class="amber">vibe coding đổi tên</span>.</li>
+          <li>Chạy lại compiler/agent nhiều lần mà không nhìn code → code <b>càng ngày càng rác</b> (software entropy).</li>
+          <li>Mình vẫn <b>đọc code, áp taste</b> — AI không thay được trách nhiệm.</li>
+        </ul>
+        <div class="quote-big reveal" data-d="3" style="flex:none;justify-content:center">
+          <blockquote style="font-size:34px">“Bad code is the <span class="hl">most expensive</span> it’s ever been.”</blockquote>
+          <cite>Kent Beck — <b>“Invest in the design of the system every day.”</b></cite>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 5 FAILURE MODES -->
+    <section class="sheet" data-sec="Fundamentals · 5 failure mode">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Software fundamentals <span class="dim">// mình từng dính cả 5</span></div>
+        <h2>5 failure mode → 5 skill</h2>
+      </div>
+      <table class="fm reveal" data-d="2">
+        <thead><tr><th style="width:24px"></th><th style="width:34%">Failure mode</th><th>Skill cứu</th></tr></thead>
+        <tbody>
+          <tr><td class="n">1</td><td>AI làm <b style="color:var(--ink)">sai ý</b> — thiếu shared design concept</td><td class="skill"><span class="badge">Grill Me</span><br>Bắt AI phỏng vấn ngược mình (40–100 câu) tới khi cùng wavelength. Tốt hơn plan mode mặc định.</td></tr>
+          <tr><td class="n">2</td><td>AI <b style="color:var(--ink)">quá dài dòng</b> — thiếu ngôn ngữ chung</td><td class="skill"><span class="badge">Ubiquitous Language</span><br>Scan codebase → đẻ glossary markdown, mở sẵn khi plan → AI nghĩ gọn, bám plan.</td></tr>
+          <tr><td class="n">3</td><td>Làm đúng nhưng <b style="color:var(--ink)">không chạy</b> — thiếu feedback loop</td><td class="skill"><span class="badge">TDD · red-green-refactor</span><br>“Rate of feedback = your speed limit.” Không feedback loop → AI không ra output tốt.</td></tr>
+          <tr><td class="n">4</td><td><b style="color:var(--ink)">Test khó</b> — codebase tệ, shallow modules</td><td class="skill"><span class="badge">Improve architecture</span><br>Bọc logic vào <b>deep module</b>, test ở interface. Matt: “lấy 1 thứ từ buổi nay — chạy skill này.”</td></tr>
+          <tr><td class="n">5</td><td><b style="color:var(--ink)">Não không theo kịp</b> / burnout</td><td class="skill"><span class="badge">Gray box</span><br>Deep module như gray box: thiết kế interface, delegate ruột (trừ finance/billing). “Cứu cái não.”</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 14 JAGGED -->
+    <section class="sheet" data-sec="Fundamentals · Jagged">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Software fundamentals <span class="dim">// Karpathy</span></div>
+        <h2>Jagged intelligence &amp; hai con đường</h2>
+      </div>
+      <div class="cols">
+        <div class="card amber reveal" data-d="2">
+          <h3>Jagged intelligence</h3>
+          <p>AI refactor 100K dòng / tìm zero-day — <b>nhưng vẫn làm lỗi ngớ ngẩn</b>.</p>
+          <p>→ stay-in-the-loop, <b>verify</b>. Công cụ “spiky, hơi sai, stochastic nhưng cực mạnh”.</p>
+          <p style="color:var(--signal);font-weight:700">Mình luôn nghi ngờ nó.</p>
+        </div>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div class="sig-row"><div class="ic" style="color:var(--ink-faint)">▽</div><div class="tx"><b>Vibe coding</b> — nâng <span class="blue">sàn</span>: ai cũng làm được phần mềm.</div></div>
+          <div class="sig-row"><div class="ic" style="color:var(--signal)">△</div><div class="tx"><b>Agentic engineering</b> — giữ <span class="amber">trần</span> chất lượng: kỷ luật kỹ thuật để nhanh mà không hạ chất lượng.</div></div>
+          <div class="sig-punch" style="font-size:18px">Đây là cách mình chọn làm.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 QUOTES -->
+    <section class="sheet" data-sec="Chốt tư tưởng">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Chốt tư tưởng <span class="dim">// 3 câu mang về</span></div>
+      </div>
+      <div class="cols-3 reveal" data-d="2" style="align-items:stretch">
+        <div class="card" style="justify-content:space-between">
+          <p style="font-family:var(--display);font-size:23px;color:var(--ink);line-height:1.28;font-style:italic">“Invest in the design of the system <span class="amber">every day</span>.”</p>
+          <h3 style="color:var(--ink-faint)">Kent Beck</h3>
+        </div>
+        <div class="card" style="justify-content:space-between">
+          <p style="font-family:var(--display);font-size:21px;color:var(--ink);line-height:1.28;font-style:italic">“You can outsource your thinking, but you can’t outsource your <span class="blue">understanding</span>.”</p>
+          <h3 style="color:var(--ink-faint)">Karpathy</h3>
+        </div>
+        <div class="card amber" style="justify-content:space-between">
+          <p style="font-family:var(--display);font-size:24px;color:var(--ink);line-height:1.28;font-style:italic">“Rate of feedback = <span class="amber">your speed limit</span>.”</p>
+          <h3>Nguyên lý nền</h3>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 DEMOS OVERVIEW -->
+    <section class="sheet" data-sec="Demos · tổng quan">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Demos <span class="dim">// chuẩn bị trước · chạy thật · có phương án B</span></div>
+        <h2>5 demo mình chạy — toàn case Joy thật</h2>
+      </div>
+      <div class="cols" style="grid-template-columns:1.1fr 1fr">
+        <table class="fm reveal" data-d="2" style="flex:none">
+          <tbody>
+            <tr><td class="n">1</td><td class="skill">Vòng làm việc đầy đủ<br><span style="font-weight:400;color:var(--ink-soft)">useTheme bug · plan→ship</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~12'</td></tr>
+            <tr><td class="n">2</td><td class="skill">Debug từ logging<br><span style="font-weight:400;color:var(--ink-soft)">case mất Platinum</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~8'</td></tr>
+            <tr><td class="n">3</td><td class="skill">Sub-agent song song<br><span style="font-weight:400;color:var(--ink-soft)">nhiều context window</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~5'</td></tr>
+            <tr><td class="n" style="color:var(--signal)">4</td><td class="skill">Agent tự dựng/sửa UI ★<br><span style="font-weight:400;color:var(--ink-soft)">web component v4</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~10'</td></tr>
+            <tr><td class="n">5</td><td class="skill">On the go (bonus)<br><span style="font-weight:400;color:var(--ink-soft)">Telegram → máy ở nhà</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~3'</td></tr>
+          </tbody>
+        </table>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div class="card amber">
+            <h3>Thứ tự ưu tiên nếu thiếu giờ</h3>
+            <div class="chips">
+              <span class="chip"><b>1</b> bắt buộc</span><span class="chip"><b>4</b> điểm nhấn</span>
+              <span class="chip"><b>2</b></span><span class="chip"><b>3</b></span><span class="chip">5 bonus</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Mình chuẩn bị trước buổi</h3>
+            <p>2–3 workspace đã <span class="k" style="color:var(--blueprint)">cd</span> repo joy · login Chrome + computer use · 1 nhánh sạch · <b>recording mỗi demo</b> phòng live hỏng.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 DEMO 1 -->
+    <section class="sheet" data-sec="Demo 1">
+      <div class="eyebrow reveal" data-d="1">Demo <span class="dim">// cho Mục 2 · ~12'</span></div>
+      <div class="demo-hero">
+        <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">1</span></div>
+        <div class="demo-info reveal" data-d="3">
+          <div class="demo-pill"><span class="t">case:</span> useTheme.js — widget crash <b>reading 'brandColor'</b></div>
+          <h2>Vòng làm việc đầy đủ trên 1 bug thật</h2>
+          <div class="demo-grid">
+            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Mình <b>plan mode trước</b> → clear → implement (<span class="k" style="color:var(--blueprint)">settings = {}</span>) → review diff → commit &amp; push, tất cả bằng commands.</p></div>
+            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>plan→ship không gõ code tay · clear context giữa phase · <b>mình verify</b> cái AI nhận “xong”.</p></div>
+          </div>
+          <div class="demo-fb"><b>FALLBACK →</b> mở recording · hoặc review diff có sẵn</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 DEMO 2 -->
+    <section class="sheet" data-sec="Demo 2">
+      <div class="eyebrow reveal" data-d="1">Demo <span class="dim">// cho Mục 3 · ~8'</span></div>
+      <div class="demo-hero">
+        <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">2</span></div>
+        <div class="demo-info reveal" data-d="3">
+          <div class="demo-pill"><span class="t">case:</span> Base Nutrition — <b>relaunch tier mất hết Platinum</b></div>
+          <h2>Debug từ logging — không cần khách</h2>
+          <div class="demo-grid">
+            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Câu hỏi mơ hồ kiểu khách → đọc Slack + Crisp → query <span class="k" style="color:var(--blueprint)">Firestore tiers/programs</span> → <b>181 Platinum dính tier cũ, V2 = 0</b>.</p></div>
+            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>Key theo level support · <b>nguồn sự thật &gt; suy đoán</b> · root cause + bằng chứng số, không login store khách.</p></div>
+          </div>
+          <div class="demo-fb"><b>FALLBACK →</b> transcript/log đã lưu của chính case này</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 DEMO 3 -->
+    <section class="sheet" data-sec="Demo 3">
+      <div class="eyebrow reveal" data-d="1">Demo <span class="dim">// cho Mục 3 · ~5'</span></div>
+      <div class="demo-hero">
+        <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">3</span></div>
+        <div class="demo-info reveal" data-d="3">
+          <div class="demo-pill"><span class="t">siêu năng lực:</span> <b>sub-agent chạy song song</b></div>
+          <h2>Nhiều việc độc lập — cùng một lúc</h2>
+          <div class="demo-grid">
+            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Giao 2–3 việc độc lập: rà i18n thiếu · tìm chỗ dùng <span class="k" style="color:var(--blueprint)">useTheme</span> · đọc changelog → chạy nền, <b>báo về khi xong (push)</b>.</p></div>
+            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p><b>Agent ≠ Skill</b>: agent = vai/context riêng để parallel; skill = đóng gói quy trình. Main context vẫn gọn.</p></div>
+          </div>
+          <div class="demo-fb"><b>FALLBACK →</b> chỉ chạy 2 agent · hoặc mô tả qua sơ đồ</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 DEMO 4 -->
+    <section class="sheet" data-sec="Demo 4 · điểm nhấn">
+      <div class="eyebrow reveal" data-d="1" style="color:var(--signal)">Demo điểm nhấn <span class="dim">// cho Mục 6 · ~10'</span></div>
+      <div class="demo-hero">
+        <div class="demo-badge star reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">4</span></div>
+        <div class="demo-info reveal" data-d="3">
+          <div class="demo-pill"><span class="t">case:</span> add 1 UI block vào v4 — skill <b>add-ui-block</b></div>
+          <h2>Agent tự dựng &amp; sửa UI</h2>
+          <div class="demo-grid">
+            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Invoke <b>ui-builder</b> → tự <span class="k" style="color:var(--blueprint)">vite dev</span> → mở preview qua Playwright → <b>tự chụp tự chấm</b> → lệch thì tự sửa tới khi đạt.</p></div>
+            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>consistency = constraint · self-runnable loop (1 lệnh) · preview cô lập = <b>sân chơi evaluator</b>. Không drift.</p></div>
+          </div>
+          <div class="demo-fb"><b>FALLBACK →</b> storybook có sẵn + cho agent chỉnh 1 style nhỏ &amp; tự screenshot chấm</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 21 DEMO 5 -->
+    <section class="sheet" data-sec="Demo 5 · bonus">
+      <div class="eyebrow reveal" data-d="1">Demo bonus <span class="dim">// tùy chọn · ~3'</span></div>
+      <div class="demo-hero">
+        <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">5</span></div>
+        <div class="demo-info reveal" data-d="3">
+          <div class="demo-pill"><span class="t">conduct on the go:</span> <b>OpenClaw / Telegram</b></div>
+          <h2>Ra lệnh dev từ điện thoại</h2>
+          <div class="demo-grid">
+            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Từ Telegram nhắn 1 yêu cầu nhỏ — <span class="k" style="color:var(--blueprint)">“tóm tắt MR !xxxx”</span> / “check log shop X” → máy ở nhà (Mac mini/Pi) thực thi, trả về điện thoại.</p></div>
+            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>Chia <b>nhiều máy chạy song song</b> · điều phối dev mọi nơi.</p></div>
+          </div>
+          <div class="demo-fb"><b>FALLBACK →</b> screenshot lịch sử chat Telegram đã làm việc thật</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 TOOLBOX A · PLUGINS -->
+    <section class="sheet" data-sec="Toolbox · Plugins">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Bộ công cụ mình dùng <span class="dim">// plugins · bật là chạy</span></div>
+        <h2>Plugin cho vòng <span class="amber">plan → ship</span></h2>
+      </div>
+      <div class="cols-3 reveal" data-d="2">
+        <div class="card">
+          <h3><span class="n">›</span> Plan → Ship</h3>
+          <div class="chips">
+            <span class="chip"><b>superpowers</b></span><span class="chip">feature-dev</span>
+            <span class="chip">code-review</span><span class="chip">code-simplifier</span>
+            <span class="chip">commit-commands</span>
+          </div>
+          <p><b>superpowers</b> = brainstorming · TDD · systematic-debugging · writing/executing-plans · verification. Đúng kỷ luật Mục 2.</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">›</span> Loop &amp; Taste</h3>
+          <div class="chips">
+            <span class="chip"><b>ralph-loop</b></span><span class="chip"><b>playwright</b></span>
+            <span class="chip">frontend-design</span><span class="chip">skill-creator</span>
+            <span class="chip">context7</span>
+          </div>
+          <p><span class="k">/goal</span> vòng lặp có exit (Mục 5) · playwright = generator–evaluator tự mở app chấm (Demo 4) · skill-creator tự đóng gói quy trình.</p>
+        </div>
+        <div class="card amber">
+          <h3><span class="n">›</span> Stack &amp; Guardrail</h3>
+          <div class="chips">
+            <span class="chip"><b>firebase</b></span><span class="chip">shopify-ai-toolkit</span>
+            <span class="chip">liquid-skills</span><span class="chip">vercel</span>
+            <span class="chip">cloudflare</span><span class="chip">security-guidance</span>
+          </div>
+          <p><b>firebase</b> → query Firestore (đúng Demo 2) · shopify + liquid cho theme · security-guidance giữ guardrail.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 TOOLBOX B · JOY SKILLS -->
+    <section class="sheet" data-sec="Toolbox · Joy skills">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Bộ công cụ mình dùng <span class="dim">// skills nội bộ · .env.agent</span></div>
+        <h2>Joy/Avada skills — <span class="amber">siêu năng lực</span> ở local</h2>
+        <div class="sub">Đây chính là <span class="k">.env.agent</span> ở Mục 3: skill kết nối nguồn sự thật → mình tự debug không cần khách.</div>
+      </div>
+      <div class="cols-3 reveal" data-d="2">
+        <div class="card amber">
+          <h3><span class="n">›</span> Support &amp; Debug</h3>
+          <div class="chips">
+            <span class="chip"><b>crisp-reader</b></span><span class="chip"><b>slack-reader</b></span>
+            <span class="chip">avada-tickets</span><span class="chip">gcp-logs</span>
+            <span class="chip">billing-monitor</span>
+          </div>
+          <p>Đọc hội thoại Crisp/Slack · ticket · log production · chi phí GCP → đúng <b>Demo 2</b> (root cause từ nguồn, không login store khách).</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">›</span> CRM &amp; Task</h3>
+          <div class="chips">
+            <span class="chip"><b>twenty-crm</b></span><span class="chip">notion-tasks</span>
+            <span class="chip">joy-my-tasks</span>
+          </div>
+          <p>Tra merchant theo Shopify domain · quản lý board Notion · standup cá nhân.</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">›</span> Connectors (MCP)</h3>
+          <div class="chips">
+            <span class="chip"><b>claude-in-chrome</b></span><span class="chip">chrome-devtools</span>
+            <span class="chip">Firestore</span><span class="chip">Shopify</span>
+            <span class="chip">GitLab MR</span>
+          </div>
+          <p>claude-in-chrome = duyệt web <b>tiết kiệm token</b> (Mục 2). Key theo <b>level support</b> · secret nằm trong <span class="k">.env.agent</span>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24 WRAP UP -->
+    <section class="sheet" data-sec="Mục 7 · Wrap-up">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 7 <span class="dim">// 5' · wrap-up &amp; Q&amp;A</span></div>
+        <h2>Guardrails &amp; next steps</h2>
+      </div>
+      <div class="cols">
+        <div class="card reveal" data-d="2" style="border-color:var(--signal-d);background:linear-gradient(180deg,#FBF3EE,#FAEDE6)">
+          <h3 style="color:var(--signal)">⚠ Guardrails — không bao giờ</h3>
+          <ul class="b" style="gap:10px;margin-top:4px">
+            <li class="warn"><b>KHÔNG</b> merge / push master khi chưa có người duyệt.</li>
+            <li class="warn"><b>KHÔNG</b> đụng billing-discount khi chưa duyệt.</li>
+            <li class="warn"><b>KHÔNG</b> chạy <span class="k" style="color:var(--signal)">--dangerously-skip-permissions</span> bừa.</li>
+          </ul>
+        </div>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px">
+          <div class="card amber">
+            <h3>Homework</h3>
+            <p>Mỗi người <b>ship 1 bug Joy bằng full workflow</b> trong tuần. Cheat-sheet 1 trang.</p>
+          </div>
+          <div class="card">
+            <h3>Đo lường sau buổi</h3>
+            <p>Theo dõi <span class="k" style="color:var(--blueprint)">số idea test/tuần</span> · % bug ship qua workflow → biết team thật sự đổi cách làm.</p>
+          </div>
+          <div style="font-family:var(--mono);color:var(--blueprint);font-size:14px;letter-spacing:.08em;text-align:center;font-weight:600">Q &amp; A nhanh →</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 CLOSING -->
+    <section class="sheet" data-sec="Câu chốt">
+      <div class="eyebrow reveal" data-d="1">Câu chốt <span class="dim">// killer line</span></div>
+      <div class="close-wrap">
+        <h1 class="reveal" data-d="2">Đừng chỉ dạy người dùng <span class="strike">AI giỏi hơn</span> —<br>hãy làm <span class="amber">codebase</span> để cả<br>người-kém-AI cũng <span class="amber">ship được consistent.</span></h1>
+        <div class="close-foot reveal" data-d="3">
+          <span>AI for Development</span><span class="dot"></span>
+          <span>Joy · Avada Dev Team</span><span class="dot"></span>
+          <span>Design the interface, delegate the implementation.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- chrome -->
+    <div id="titleblock">
+      <div class="cell"><span class="lbl">SHEET</span><span id="tb-num"><b>01</b> / 23</span></div>
+      <div class="cell"><span id="tb-sec">Cover</span></div>
+      <div class="cell"><span class="lbl">REV.</span>—</div>
+    </div>
+    <div class="footmark">AI · how I'm doing it</div>
+    <div id="hint"><kbd>←</kbd> <kbd>→</kbd> hoặc <kbd>Space</kbd> để chuyển slide</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.sheet'));
+  var total = slides.length;
+  var i = 0;
+  var tbNum = document.getElementById('tb-num');
+  var tbSec = document.getElementById('tb-sec');
+  var progress = document.getElementById('progress');
+  var hint = document.getElementById('hint');
+  setTimeout(function(){ hint.classList.add('hide'); }, 4500);
+
+  function pad(n){ return (n<10?'0':'')+n; }
+
+  function show(n){
+    n = Math.max(0, Math.min(total-1, n));
+    slides[i].classList.remove('active');
+    i = n;
+    slides[i].classList.add('active');
+    tbNum.innerHTML = '<b>'+pad(i+1)+'</b> / '+pad(total);
+    tbSec.textContent = slides[i].getAttribute('data-sec') || '';
+    progress.style.width = (i/(total-1)*100)+'%';
+  }
+  function next(){ if(i<total-1) show(i+1); }
+  function prev(){ if(i>0) show(i-1); }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); next(); hint.classList.add('hide'); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); prev(); }
+    else if(e.key==='Home'){ e.preventDefault(); show(0); }
+    else if(e.key==='End'){ e.preventDefault(); show(total-1); }
+  });
+  document.getElementById('deck').addEventListener('click', function(e){
+    var r=this.getBoundingClientRect();
+    if((e.clientX-r.left)>r.width*0.5) next(); else prev();
+  });
+  function fit(){
+    var s=Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.getElementById('deck').style.transform='scale('+s+')';
+  }
+  window.addEventListener('resize', fit);
+  fit(); show(0);
+})();
+</script>
+</body>
+</html>
