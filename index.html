@@ -575,23 +575,23 @@
           <div class="eyebrow">Slide đinh <span class="dim">// kỹ thuật quan trọng nhất</span></div>
           <h2 style="margin-top:12px">Design the <span class="amber">interface</span>,<br>delegate the implementation.</h2>
         </div>
-        <div class="note">deep module · Ousterhout<br>gray box · stay-in-the-loop<br>discountService.js</div>
+        <div class="note">deep module · Ousterhout<br>gray box · stay-in-the-loop<br>thumbnailService.ts</div>
       </div>
       <div class="sig-body">
         <div class="graybox reveal" data-d="2">
-          <div class="gb-label"><span>MODULE — discountService.js</span><span class="lock">▣ interface locked</span></div>
+          <div class="gb-label"><span>MODULE — thumbnailService.ts</span><span class="lock">▣ interface locked</span></div>
           <div class="gb-interface">
 <span class="cm">// mình GIỮ tay: nhỏ, rõ, ổn định</span><br>
-<span class="fn">generateByDiscountFunctionV2</span>({ <span class="pr">shop, program,</span><br>
-&nbsp;&nbsp;<span class="pr">customer, discountParams</span> })<br>
-<span class="arrow">→</span> <span class="kw">Promise</span>&lt;{ priceRule, discount }&gt;
+<span class="fn">makeThumbnail</span>({ <span class="pr">src, width,</span><br>
+&nbsp;&nbsp;<span class="pr">format</span> })<br>
+<span class="arrow">→</span> <span class="kw">Promise</span>&lt;{ url, width, height }&gt;
           </div>
           <div class="gb-interior">
             <div class="interior-tag">ruột — agent fill</div>
             <div class="gb-blur">
-              build metafield V2 · map appliedTo (all / specific / exclude)<br>
-              free-shipping · quantity rules · limit cart value · combinesWith<br>
-              runDiscountMutation → Shopify · branch · branch · branch …
+              decode (jpg/png/webp/heic) · EXIF orient · resize · crop<br>
+              color profile · re-encode + quality · strip metadata<br>
+              upload CDN · cache key · branch · branch · branch …
             </div>
           </div>
         </div>
@@ -599,7 +599,7 @@
           <div class="sig-row"><div class="ic">~</div><div class="tx"><b>Mình không burnout</b> — chỉ ôm interface, không đọc từng dòng (trừ tính tiền / billing thì vẫn soi).</div></div>
           <div class="sig-row"><div class="ic">≠</div><div class="tx"><b>AI ít drift</b> — bị ràng bởi contract, không bịa abstraction lan ra ngoài.</div></div>
           <div class="sig-row"><div class="ic">◉</div><div class="tx"><b>Test gọn</b> — chấm ở 1 boundary lớn thay vì 20 file vụn. deep &gt; shallow.</div></div>
-          <div class="sig-punch">Mình review chỉ hỏi: <span class="amber">“interface có đổi? output shape đúng?”</span> — không đọc 200 dòng metafield.</div>
+          <div class="sig-punch">Mình review chỉ hỏi: <span class="amber">“interface có đổi? output shape đúng?”</span> — không đọc 200 dòng xử lý ảnh.</div>
         </div>
       </div>
     </section>
@@ -738,7 +738,7 @@
       <div class="demo-hero">
         <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">2</span></div>
         <div class="demo-info reveal" data-d="3">
-          <div class="demo-pill"><span class="t">case:</span> Base Nutrition — <b>relaunch tier mất hết Platinum</b></div>
+          <div class="demo-pill"><span class="t">case:</span> 1 shop loyalty (ẩn danh) — <b>relaunch tier mất hết Platinum</b></div>
           <h2>Debug từ logging — không cần khách</h2>
           <div class="demo-grid">
             <div class="demo-box"><div class="lbl">Kịch bản</div><p>Câu hỏi mơ hồ kiểu khách → đọc Slack + Crisp → query <span class="k" style="color:var(--blueprint)">Firestore tiers/programs</span> → <b>181 Platinum dính tier cũ, V2 = 0</b>.</p></div>
