@@ -508,6 +508,10 @@
             <h3><span class="n">›</span> CLI tools</h3>
             <p>Bảo Claude dùng <span class="k">gh · aws · gcloud</span> — context-efficient hơn gọi API tay.</p>
           </div>
+          <div class="card amber">
+            <h3><span class="n">›</span> Launch nhanh</h3>
+            <p>Mình mở session bằng <span class="k">--dangerously-skip-permissions</span> (YOLO mode) trong context an toàn → khỏi click duyệt. Set <b>alias</b> (<span class="k">cy = claude --dangerously-skip-permissions</span>) cho lệnh hay dùng.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -820,7 +824,7 @@
             <tr><td class="n">2</td><td class="skill">Debug từ logging<br><span style="font-weight:400;color:var(--ink-soft)">case mất Platinum</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~8'</td></tr>
             <tr><td class="n">3</td><td class="skill">Sub-agent song song<br><span style="font-weight:400;color:var(--ink-soft)">nhiều context window</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~5'</td></tr>
             <tr><td class="n" style="color:var(--signal)">4</td><td class="skill">Agent tự dựng/sửa UI ★<br><span style="font-weight:400;color:var(--ink-soft)">web component v4</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~10'</td></tr>
-            <tr><td class="n">5</td><td class="skill">On the go (bonus)<br><span style="font-weight:400;color:var(--ink-soft)">Telegram → máy ở nhà</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~3'</td></tr>
+            <tr><td class="n" style="color:var(--signal)">5</td><td class="skill">OpenClaw — <b>mở màn</b><br><span style="font-weight:400;color:var(--ink-soft)">Telegram → máy ở nhà</span></td><td style="font-family:var(--mono);color:var(--ink-soft);text-align:right">~3'</td></tr>
           </tbody>
         </table>
         <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
@@ -828,7 +832,7 @@
             <h3>Thứ tự ưu tiên nếu thiếu giờ</h3>
             <div class="chips">
               <span class="chip"><b>1</b> bắt buộc</span><span class="chip"><b>4</b> điểm nhấn</span>
-              <span class="chip"><b>2</b></span><span class="chip"><b>3</b></span><span class="chip">5 bonus</span>
+              <span class="chip"><b>5</b> mở màn</span><span class="chip"><b>2</b></span><span class="chip"><b>3</b></span>
             </div>
           </div>
           <div class="card">
@@ -862,13 +866,13 @@
       <div class="demo-hero">
         <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">2</span></div>
         <div class="demo-info reveal" data-d="3">
-          <div class="demo-pill"><span class="t">case:</span> 1 shop loyalty (ẩn danh) — <b>relaunch tier mất hết Platinum</b></div>
-          <h2>Debug từ logging — không cần khách</h2>
+          <div class="demo-pill"><span class="t">case:</span> lấy <b>1 ticket mới live</b> trên kênh #support (Slack)</div>
+          <h2>Check bug → tạo task — đủ key, không cần browser</h2>
           <div class="demo-grid">
-            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Câu hỏi mơ hồ kiểu khách → đọc Slack + Crisp → query <span class="k" style="color:var(--blueprint)">Firestore tiers/programs</span> → <b>181 Platinum dính tier cũ, V2 = 0</b>.</p></div>
-            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>Key theo level support · <b>nguồn sự thật &gt; suy đoán</b> · root cause + bằng chứng số, không login store khách.</p></div>
+            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Chộp <b>1 case mới</b> trên #support → đọc thread + Crisp → query <span class="k" style="color:var(--blueprint)">Firestore</span> → root cause → <b>brainstorm fix → tạo task</b>.</p></div>
+            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>Agent <b>đủ key</b> (Crisp/Slack/Firestore) → làm trọn vòng <b>không reach browser</b>, không cần khách. Nguồn sự thật &gt; suy đoán.</p></div>
           </div>
-          <div class="demo-fb"><b>FALLBACK →</b> transcript/log đã lưu của chính case này</div>
+          <div class="demo-fb"><b>FALLBACK →</b> dùng 1 case đã lưu nếu kênh trống</div>
         </div>
       </div>
     </section>
@@ -879,7 +883,7 @@
       <div class="demo-hero">
         <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">3</span></div>
         <div class="demo-info reveal" data-d="3">
-          <div class="demo-pill"><span class="t">siêu năng lực:</span> <b>sub-agent chạy song song</b></div>
+          <div class="demo-pill"><span class="t">super power:</span> <b>sub-agent development — chạy song song</b></div>
           <h2>Nhiều việc độc lập — cùng một lúc</h2>
           <div class="demo-grid">
             <div class="demo-box"><div class="lbl">Kịch bản</div><p>Giao 2–3 việc độc lập: rà i18n thiếu · tìm chỗ dùng <span class="k" style="color:var(--blueprint)">useTheme</span> · đọc changelog → chạy nền, <b>báo về khi xong (push)</b>.</p></div>
@@ -899,8 +903,8 @@
           <div class="demo-pill"><span class="t">case:</span> add 1 UI block vào v4 — skill <b>add-ui-block</b></div>
           <h2>Agent tự dựng &amp; sửa UI</h2>
           <div class="demo-grid">
-            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Invoke <b>ui-builder</b> → tự <span class="k" style="color:var(--blueprint)">vite dev</span> → mở preview qua Playwright → <b>tự chụp tự chấm</b> → lệch thì tự sửa tới khi đạt.</p></div>
-            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>consistency = constraint · self-runnable loop (1 lệnh) · preview cô lập = <b>sân chơi evaluator</b>. Không drift.</p></div>
+            <div class="demo-box"><div class="lbl">Kịch bản</div><p>Invoke <b>imagine / ui-builder</b> skill → tự <span class="k" style="color:var(--blueprint)">vite dev</span> → preview qua Playwright → <b>tự chụp tự chấm</b> → tự sửa tới khi đạt.</p></div>
+            <div class="demo-box proves"><div class="lbl">Chứng minh</div><p>Bài học: thiết kế <b>codebase ready cho prototyping</b> — design system + skill = sân chơi để agent imagine mà không drift.</p></div>
           </div>
           <div class="demo-fb"><b>FALLBACK →</b> storybook có sẵn + cho agent chỉnh 1 style nhỏ &amp; tự screenshot chấm</div>
         </div>
@@ -909,7 +913,7 @@
 
     <!-- 21 DEMO 5 -->
     <section class="sheet" data-sec="Demo 5 · bonus">
-      <div class="eyebrow reveal" data-d="1">Demo bonus <span class="dim">// tùy chọn · ~3'</span></div>
+      <div class="eyebrow reveal" data-d="1">Demo mở màn <span class="dim">// OpenClaw — chạy đầu tiên · ~3'</span></div>
       <div class="demo-hero">
         <div class="demo-badge reveal" data-d="2"><span class="dn">DEMO</span><span class="dbig">5</span></div>
         <div class="demo-info reveal" data-d="3">
@@ -1055,7 +1059,7 @@
           <ul class="b" style="gap:10px;margin-top:4px">
             <li class="warn"><b>KHÔNG</b> merge / push master khi chưa có người duyệt.</li>
             <li class="warn"><b>KHÔNG</b> đụng billing-discount khi chưa duyệt.</li>
-            <li class="warn"><b>KHÔNG</b> chạy <span class="k" style="color:var(--signal)">--dangerously-skip-permissions</span> bừa.</li>
+            <li class="warn"><b>KHÔNG</b> tin AI nhận “xong” — luôn <b>tự verify</b> trước khi merge (YOLO nhanh, nhưng vẫn check).</li>
           </ul>
         </div>
         <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px">
