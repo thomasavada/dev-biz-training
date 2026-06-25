@@ -329,6 +329,10 @@
 
     <!-- 1 TITLE -->
     <section class="sheet active" data-sec="Cover">
+      <div style="position:absolute;top:58px;right:74px;z-index:6;display:flex;flex-direction:column;align-items:center;gap:7px">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwAQMAAAAEm3vRAAAABlBMVEX7+fIcGBOg4D+GAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABkElEQVRYhe2YPbKDMAyE5UlByRE4Ckezj8ZROAJlCsbKrmSHZPKK18qDCkj8QSG01o9Fbrvt07LSNlGRSfe1JD0nWzqjY16WLWtSPRYtks7pwFIKj20ZftNR3Cv8x2M6Cobf5m9OdSwsUh96yEqJDoKbUhnJGVux/i3kgNhzC/DjOSO3EP+mnoD4MmKR3/WgmH5TmQqlmv/S/A+PEUjh1sPv2cqcl72u1HExd6YWVMEn7/ZZgHu842IIF/76lkR5T/7/kkNULCZgGCO5WxUUBliiY1RBKrV4TkXqQXn/VGpYLAwgW2jrV7Zcqdj9+ixxsbBf6UXCFIoZQaRGx7n1K9rMly+lBsasBvDbFdse2vJXsQiJewNGhxdWOzzOzlOi46ZU34rKTtPW6+iYcUb1e/dryeOtZ3Dc42pDHoRsfiPu4XFuO7IJWPoUe70WFfPC8Ty5UlM7WPkeciPi94GKfil1GOxnemsrg6vqKNhOY9UUOvXaERu7UrP6uFrEc0uJj3tuaUOPtiFIouPbbvunvQD+kIZBMXqz1AAAAABJRU5ErkJggg==" alt="QR · deck live" style="width:108px;height:108px;display:block;image-rendering:pixelated;border:1px solid var(--rule);background:#FBF9F2">
+        <span style="font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase">scan → deck live</span>
+      </div>
       <div class="eyebrow reveal" data-d="1">Cách mình đang làm việc với AI <span class="dim">// Joy · Avada Dev Team</span></div>
       <div class="title-wrap">
         <h1 class="reveal" data-d="2"><span class="ai">AI</span> — <span class="dev">how I'm doing it</span></h1>
@@ -447,6 +451,63 @@
       </div>
     </section>
 
+    <!-- 5b INSIGHTS -->
+    <section class="sheet" data-sec="Mục 2 · /insights">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 2 <span class="dim">// /insights · soi chính mình</span></div>
+        <h2>Thói quen vận hành — <span class="amber">đo chính mình</span></h2>
+        <div class="sub">Mình chạy <span class="k">/insights</span> soi ~20k prompt của chính mình. Số liệu nói thật hơn cảm giác.</div>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li><b style="color:var(--signal)">99%</b> prompt bằng <b>English</b> — habit này mình giữ được.</li>
+          <li><b style="color:var(--signal)">~30%</b> prompt ≤ 4 từ · median <b>8 từ</b> — gọn, tiết kiệm token.</li>
+          <li><span class="k">clear · compact · resume</span> dùng đều tay — context hygiene ổn.</li>
+          <li><b style="color:var(--signal)">/commit ~1.3k</b> nhưng <b>/plan + /review ~30</b> — commit nhiều, plan ít.</li>
+        </ul>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div class="card amber">
+            <h3>Rút ra</h3>
+            <ul class="b" style="gap:9px;margin-top:2px">
+              <li><b>✓ Giữ:</b> English-first · prompt gọn · clear context đều tay.</li>
+              <li class="warn"><b>⚠ Sửa:</b> ship nhiều mà plan/review ít → dễ AI slop. Nâng plan → review trước khi commit.</li>
+              <li><b>→ Tận dụng:</b> mình hay debug bằng screenshot → đẩy mạnh Claude-in-Chrome / computer use.</li>
+            </ul>
+          </div>
+          <div class="sig-punch">Đừng đoán thói quen — chạy <span class="amber">/insights</span>, để số liệu chỉ chỗ rò.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5c CONTEXT NEN -->
+    <section class="sheet" data-sec="Mục 2 · Context nền">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 2 <span class="dim">// best-practices · context nền</span></div>
+        <h2>Context nền — <span class="amber">CLAUDE.md</span> & set 1 lần</h2>
+        <div class="sub">Best-practices Claude Code xoay quanh 1 ràng buộc: <b>context đầy nhanh → perf tụt</b>. Set nền tốt = đỡ giải thích lại mỗi lần.</div>
+      </div>
+      <div class="cols">
+        <div class="card amber reveal" data-d="2">
+          <h3><span class="k" style="color:var(--signal)">CLAUDE.md</span></h3>
+          <ul class="b" style="gap:10px;margin-top:2px">
+            <li><span class="k">/init</span> sinh bản nháp → mình prune dần.</li>
+            <li>Chỉ ghi thứ Claude <b>không tự đoán</b>: lệnh build, code style khác default, gotcha.</li>
+            <li><b>NGẮN</b> — file dài = Claude bỏ nửa rule. Hỏi “bỏ dòng này có sai không?”, không thì cắt.</li>
+          </ul>
+        </div>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div class="card">
+            <h3><span class="n">›</span> Hooks (deterministic)</h3>
+            <p>Việc PHẢI xảy ra mọi lần (lint sau edit · chặn ghi migrations) → <b>hook</b>, không nhét vào CLAUDE.md (chỉ advisory).</p>
+          </div>
+          <div class="card">
+            <h3><span class="n">›</span> CLI tools</h3>
+            <p>Bảo Claude dùng <span class="k">gh · aws · gcloud</span> — context-efficient hơn gọi API tay.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 6 MUC 3 CLAUDE LOCAL -->
     <section class="sheet" data-sec="Mục 3 · Claude Local">
       <div class="shead reveal" data-d="1">
@@ -527,6 +588,65 @@
             <h3>Tự động hóa thật</h3>
             <p><b>worker / morning loop</b> chạy nền định kỳ · <span class="k">/loop</span> command (≈ plugin <b>ralph-loop</b>) · gắn vào <span class="k">avada-tickets</span> → mỗi vòng ship 1 ticket Joy.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8c LOOP DISCIPLINE -->
+    <section class="sheet" data-sec="Mục 5 · Kỷ luật loop">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 5 <span class="dim">// cảnh báo · token là tiền thật</span></div>
+        <h2>Loop ≠ chạy vô tận — <span class="amber">kẻo cháy token</span></h2>
+        <div class="sub">“Lúc nào cũng chạy loop” thực ra chỉ hợp với ai có token vô hạn. Loop lỏng để tự chạy mãi → đốt token cả tuần như chơi.</div>
+      </div>
+      <div class="cols">
+        <div class="card reveal" data-d="2" style="border-color:var(--signal-d);background:linear-gradient(180deg,#FBF3EE,#FAEDE6)">
+          <h3 style="color:var(--signal)">⚠ Bẫy đốt token</h3>
+          <ul class="b" style="gap:12px;margin-top:4px">
+            <li class="warn">Loop <b>vô hạn, không exit</b> → chạy qua đêm vô tội vạ.</li>
+            <li class="warn">Mở <b>nhiều loop lỏng cùng lúc</b> → nhân chi phí token.</li>
+            <li class="warn">Để agent <b>tự “chạy tiếp”</b> không verify → đốt token vào AI slop.</li>
+          </ul>
+        </div>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div class="card amber">
+            <h3>Quy tắc loop của mình</h3>
+            <ul class="b" style="gap:10px;margin-top:2px">
+              <li>Luôn có <b>điều kiện exit + giới hạn vòng</b> (max N rounds).</li>
+              <li><b>1 mục tiêu rõ / loop</b> — ít loop mà chặt hơn nhiều loop lỏng.</li>
+              <li><b>Verify mỗi vòng</b> (generator–evaluator) → đạt là dừng ngay.</li>
+              <li>Cắt loop <b>không hội tụ</b>; clear context giữa phase.</li>
+            </ul>
+          </div>
+          <div class="sig-punch">Đo <span class="amber">token/tuần</span>. Loop là dao 2 lưỡi: chặt thì sắc, lỏng thì đốt tiền thật.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8d HOW TO PROMPT A LOOP -->
+    <section class="sheet" data-sec="Mục 5 · Cách prompt loop">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Mục 5 <span class="dim">// cách mình prompt 1 loop</span></div>
+        <h2>Prompt loop — <span class="amber">chặt ngay từ đầu</span></h2>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li><b>Mục tiêu đo được</b> — “0 test fail”, không phải “làm cho tốt”.</li>
+          <li><b>Input từng món</b> — 1 ticket / 1 item mỗi vòng, không ôm cả đống.</li>
+          <li><b>Việc rõ mỗi vòng</b> + <b>bước verify</b> (tự chấm trước khi qua vòng).</li>
+          <li><b>EXIT + MAX ROUNDS</b> bắt buộc — hết vòng thì DỪNG &amp; báo cáo.</li>
+          <li><b>NEVER list</b> — chặn loop đi lạc (đụng file ngoài phạm vi…).</li>
+        </ul>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;justify-content:center">
+          <pre><span class="tag">/ralph-loop</span><span class="cm"># loop: fix failing tests</span>
+<span class="pr">GOAL</span>: all tests green
+<span class="pr">EACH ROUND</span>:
+  1 run <span class="st">`npm test`</span>, take 1st fail
+  2 fix root cause <span class="cm">(don't edit the test)</span>
+  3 re-run + verify
+<span class="kw">EXIT WHEN</span>: 0 failures
+<span class="kw">MAX ROUNDS</span>: 8 <span class="arrow">→</span> STOP + report
+<span class="kw">NEVER</span>: touch unrelated files</pre>
         </div>
       </div>
     </section>
@@ -874,6 +994,51 @@
       </div>
     </section>
 
+    <!-- 23c KNOWLEDGE BASE -->
+    <section class="sheet" data-sec="Toolbox · Knowledge base">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Hệ thống mình dùng <span class="dim">// knowledge base · second brain</span></div>
+        <h2>Knowledge base — <span class="amber">Obsidian</span> (hoặc Notion)</h2>
+        <div class="sub">AI mạnh khi context có cấu trúc. Mình giữ 1 wiki làm <b>bộ nhớ ngoài</b> → đỡ giải thích lại, đỡ tốn token, ngữ cảnh nhất quán.</div>
+      </div>
+      <div class="cols">
+        <ul class="b reveal" data-d="2">
+          <li><b>Mình ingest nguồn</b> (talk, doc, case đã giải) → vault có cấu trúc.</li>
+          <li><b>Claude đọc thẳng vault</b> → query / trả lời / lint, không bắt mình nhớ lại.</li>
+          <li><b>Mở glossary khi plan</b> (nối Ubiquitous Language) → AI bám đúng ngôn ngữ dự án.</li>
+          <li><b>Fold / log định kỳ</b> → kiến thức không trôi, tra lại được.</li>
+        </ul>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div class="card amber">
+            <h3><span class="n">›</span> Obsidian</h3>
+            <p>Plugin <b>claude-obsidian</b> (có sẵn trong setup): <span class="k">ingest · query · lint · canvas</span>. Vault = second brain offline, versioned bằng git.</p>
+          </div>
+          <div class="card">
+            <h3><span class="n">›</span> Notion</h3>
+            <p>Ai thích Notion thì <b>kết nối Notion</b> (<span class="k">notion-tasks</span> / API) — đúng như buổi này: agenda + nguồn nằm trên Notion.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23d ANTI-PATTERNS -->
+    <section class="sheet" data-sec="Anti-patterns">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Best-practices <span class="dim">// 4 bẫy hay gặp</span></div>
+        <h2>Anti-patterns — <span class="amber">đừng làm</span></h2>
+        <div class="sub">Show evidence, đừng assert “xong”. Nhận diện sớm 4 bẫy này = tiết kiệm cả buổi.</div>
+      </div>
+      <table class="fm reveal" data-d="2">
+        <thead><tr><th style="width:24px"></th><th style="width:44%">Bẫy</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td class="n">1</td><td><b style="color:var(--ink)">Kitchen sink</b> — trộn nhiều task khác nhau trong 1 session → context đầy rác.</td><td class="skill"><span class="k">/clear</span> giữa các task không liên quan.</td></tr>
+          <tr><td class="n">2</td><td><b style="color:var(--ink)">Sửa đi sửa lại</b> &gt; 2 lần — context ngập approach hỏng.</td><td class="skill"><span class="k">/clear</span> + viết lại prompt tốt hơn (gói cái vừa học).</td></tr>
+          <tr><td class="n">3</td><td><b style="color:var(--ink)">Trust-then-verify</b> — tin code “nhìn có vẻ đúng”.</td><td class="skill">Luôn có check (test/script/screenshot). <b>Không verify được thì không ship.</b></td></tr>
+          <tr><td class="n">4</td><td><b style="color:var(--ink)">Infinite exploration</b> — “investigate” không giới hạn → đọc trăm file, đầy context.</td><td class="skill">Scope hẹp · hoặc đẩy cho <b>sub-agent</b> (context riêng).</td></tr>
+        </tbody>
+      </table>
+    </section>
+
     <!-- 24 WRAP UP -->
     <section class="sheet" data-sec="Mục 7 · Wrap-up">
       <div class="shead reveal" data-d="1">
@@ -945,7 +1110,7 @@
         <h1 class="reveal" data-d="2">Đừng chỉ dạy người dùng <span class="strike">AI giỏi hơn</span> —<br>hãy làm <span class="amber">codebase</span> để cả<br>người-kém-AI cũng <span class="amber">ship được consistent.</span></h1>
         <div class="reveal" data-d="4" style="display:flex;align-items:center;gap:16px;margin-top:30px;justify-content:center">
           <div style="background:#fff;padding:10px;border-radius:12px;line-height:0;box-shadow:0 6px 24px rgba(0,0,0,.35)">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYAQMAAACEqAqfAAAABlBMVEX///8RERFxTxnbAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADJklEQVR4nO3dTY7bMAyGYQ6yyDJH8FFyNPtoOUqOkKUXQdTIkj6RcvqHosAAfrloFTl60hVLUMyM2TeNa4pRdk95cU2P9p7VvsrjNb+e0/3959dw8omFhYWFtVn1gIgxUrqVk8v7r3N6tf26U2PCwsLCwpJ1Kkn20VJzzreVOLnUbJuVGrFZU3m+YGFhYWH90kptx1yOTq3kzSdXLCwsLKy/sJ4ZcY9SKXmnspg9ioWFhYW1sxSn1qLdiFt/cO6EFXT9o/4EFhYW1hGtGLLCQpVuXITAwsLCwqo17hDSbz1r15GCHDFZ/yawsLCwjmeFxkHKJ80uLd9qEWtf9RQUCxYWFhaWGgKXtuFuvMamrWIdrPv7Y2o8sbCwsLBqT8HfeJWFDUQaRmCnsumaC3czLCwsLCwbTmoE1vIi9Z1zOxmHDKyhWFhYWFjNUu2bCd9cyKF2w1r8cPX1+tC9xcLCwsIy2/9kgTgU63J0jbm3Eob+BBYWFhaWu+hSjn70hZUiOObojIpw3VssLCwsLGVknVSUPd9lMKtDBq6VkLqOhYWFhVUi9hTcjuLWiX1PQen7iYWFhYX1v6wctaC+lDSv/wGuO+Jucf5rwcLCwsKq1qd2rwZsL72O/nLTXstWRytHf5r/wsLCwjqstc/R1/7a/dwCa1MJKVysDTtYWFhYWNUqy60BfLP4PTDl6FLpqu/rF7PP0VhYWFiHtvKBGip5rS3UXFBDVidrK8HdsD2xsLCwsFL4edsjmqN2b803DrbQL+A6lzfmR1hYWFhYwRLx6EXwFvuewpT28cTCwsLC6vMAu30Lt2JxpCBY+hgsLCwsLFfauhChNm6wrI0UbOGmDbCwsLCwhl5tKifdtw7c2MHLnUwpdSLMf2FhYWFh1dq3hB8p0CKj9cZr6pWucrTi8+9GxMLCwjqipV6trBSStWscpIa6ePn+BBYWFhbW3oo77rtbNeZG7HoKWFhYWFifLWtDsfXRFks/abaf4tr/K7CwsLCOailOQ8mrnoKiNhcUU/sYLCwsLKxmxVDW1ttLr/bVXvo7MOXo+Sf3aVhYWFhY/2J90/gBoWSkGnLVEusAAAAASUVORK5CYII=" alt="QR · git repo slide" style="width:120px;height:120px;display:block;image-rendering:pixelated">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwAQMAAAAEm3vRAAAABlBMVEX7+fIcGBOg4D+GAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABkElEQVRYhe2YPbKDMAyE5UlByRE4Ckezj8ZROAJlCsbKrmSHZPKK18qDCkj8QSG01o9Fbrvt07LSNlGRSfe1JD0nWzqjY16WLWtSPRYtks7pwFIKj20ZftNR3Cv8x2M6Cobf5m9OdSwsUh96yEqJDoKbUhnJGVux/i3kgNhzC/DjOSO3EP+mnoD4MmKR3/WgmH5TmQqlmv/S/A+PEUjh1sPv2cqcl72u1HExd6YWVMEn7/ZZgHu842IIF/76lkR5T/7/kkNULCZgGCO5WxUUBliiY1RBKrV4TkXqQXn/VGpYLAwgW2jrV7Zcqdj9+ixxsbBf6UXCFIoZQaRGx7n1K9rMly+lBsasBvDbFdse2vJXsQiJewNGhxdWOzzOzlOi46ZU34rKTtPW6+iYcUb1e/dryeOtZ3Dc42pDHoRsfiPu4XFuO7IJWPoUe70WFfPC8Ty5UlM7WPkeciPi94GKfil1GOxnemsrg6vqKNhOY9UUOvXaERu7UrP6uFrEc0uJj3tuaUOPtiFIouPbbvunvQD+kIZBMXqz1AAAAABJRU5ErkJggg==" alt="QR · git repo slide" style="width:120px;height:120px;display:block;image-rendering:pixelated">
           </div>
           <div style="text-align:left">
             <div style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.5px;text-transform:uppercase">Lấy slide này</div>
