@@ -511,8 +511,34 @@
           </div>
           <div class="card amber">
             <h3><span class="n">›</span> Launch nhanh</h3>
-            <p>Mình mở session bằng <span class="k">--dangerously-skip-permissions</span> (YOLO mode) trong context an toàn → khỏi click duyệt. Set <b>alias</b> (<span class="k">cy = claude --dangerously-skip-permissions</span>) cho lệnh hay dùng.</p>
+            <p>Mình mở session bằng <span class="k">--dangerously-skip-permissions</span> (YOLO) trong context an toàn — hoặc <span class="k">--permission-mode auto</span> (model tự lọc lệnh) → khỏi click duyệt. Set <b>alias</b> (<span class="k">cy = claude --dangerously-skip-permissions</span>) cho lệnh hay dùng.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5d PRO PROMPTS (BORIS) -->
+    <section class="sheet" data-sec="Mục 2 · Prompt như Boris">
+      <div class="shead reveal" data-d="1">
+        <div class="eyebrow">Best-practices <span class="dim">// Boris Cherny · 🚫👶 đừng babysit</span></div>
+        <h2>Prompt như Boris — <span class="amber">đừng babysit</span></h2>
+        <div class="sub">Giao mục tiêu, không cầm tay. Bonus Boris: <b>prototype &gt; PRD</b> (build 20–30 bản) · <b>Claude #2 review plan</b> · giữ context <b>&lt;40%</b> · commit ≥1/giờ · PR nhỏ + squash.</div>
+      </div>
+      <div class="cols-3 reveal" data-d="2">
+        <div class="card">
+          <h3><span class="n">①</span> Challenge / Grill</h3>
+          <p style="font-family:var(--display);font-size:18px;font-style:italic;color:var(--ink);line-height:1.32">“Grill me — đừng tạo PR cho tới khi tôi pass test của bạn.”</p>
+          <p>“prove to me this works” · cho Claude diff main ↔ branch.</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">②</span> Scrap &amp; redo</h3>
+          <p style="font-family:var(--display);font-size:18px;font-style:italic;color:var(--ink);line-height:1.32">“Biết những gì giờ đã biết — vứt đi, làm lại bản elegant.”</p>
+          <p>Sau 1 fix tầm thường: bảo Claude làm lại sạch, đừng vá víu.</p>
+        </div>
+        <div class="card amber">
+          <h3><span class="n">③</span> Let Claude own bugs</h3>
+          <p style="font-family:var(--display);font-size:18px;font-style:italic;color:var(--ink);line-height:1.32">“Paste bug → nói ‘fix’ → đừng micromanage cách làm.”</p>
+          <p>Claude tự fix phần lớn bug — mình chỉ verify kết quả.</p>
         </div>
       </div>
     </section>
