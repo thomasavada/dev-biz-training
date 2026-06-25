@@ -432,15 +432,19 @@
         <ul class="b reveal" data-d="2">
           <li><b>Ngôn ngữ:</b> mình luôn dùng English, ngắn gọn. Tiếng Việt / nói dài = tốn token, model lệch.</li>
           <li><b>Multitask &amp; batch:</b> mình mở nhiều workspace, không làm 1 việc 1 lúc.</li>
-          <li><b>Tiết kiệm token:</b> mình ưu tiên <span class="k">Claude in Chrome</span> / Playwright cho site không cần logout; bật computer use.</li>
+          <li><b>Tiết kiệm token:</b> mình ưu tiên <span class="k">Claude in Chrome</span> / Playwright; bật computer use.</li>
+          <li><b>Course-correct sớm:</b> <span class="k">Esc</span> dừng/redirect · <span class="k">/rewind</span> checkpoint · sai &gt;2 lần → <span class="k">/clear</span> + prompt lại.</li>
         </ul>
         <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px">
           <div class="card amber">
-            <h3>Đi đủ vòng bằng commands</h3>
-            <div class="chips">
-              <span class="chip"><b>plan</b></span><span class="chip"><b>implement</b></span>
-              <span class="chip"><b>review</b></span><span class="chip"><b>learn-from-MR</b></span>
-              <span class="chip"><b>commit &amp; push</b></span>
+            <h3>Đi đủ vòng — commands Joy có sẵn (~30)</h3>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.3">
+              <div><b style="color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.08em">PLAN</b> <span class="k">/plan · /plan-v2</span></div>
+              <div><b style="color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.08em">BUILD</b> <span class="k">/fix · /debug · /refactor · /api</span></div>
+              <div><b style="color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.08em">TEST</b> <span class="k">/test · /browser-test · /test-checklist</span></div>
+              <div><b style="color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.08em">REVIEW</b> <span class="k">/review-v2 · /security · /perf · /impact</span></div>
+              <div><b style="color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.08em">SHIP</b> <span class="k">/mr · /lint-mr · /commit · /deploy-production</span></div>
+              <div><b style="color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.08em">LEARN</b> <span class="k">/learn-from-mr · /sync-docs · /changelog</span></div>
             </div>
           </div>
           <div class="card">
@@ -463,14 +467,14 @@
           <li><b style="color:var(--signal)">99%</b> prompt bằng <b>English</b> — habit này mình giữ được.</li>
           <li><b style="color:var(--signal)">~30%</b> prompt ≤ 4 từ · median <b>8 từ</b> — gọn, tiết kiệm token.</li>
           <li><span class="k">clear · compact · resume</span> dùng đều tay — context hygiene ổn.</li>
-          <li><b style="color:var(--signal)">/commit ~1.3k</b> nhưng <b>/plan + /review ~30</b> — commit nhiều, plan ít.</li>
+          <li><b style="color:var(--signal)">Plan mode</b> trước khi code · <b>verify</b> trước khi commit — chốt vòng.</li>
         </ul>
         <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
           <div class="card amber">
             <h3>Rút ra</h3>
             <ul class="b" style="gap:9px;margin-top:2px">
               <li><b>✓ Giữ:</b> English-first · prompt gọn · clear context đều tay.</li>
-              <li class="warn"><b>⚠ Sửa:</b> ship nhiều mà plan/review ít → dễ AI slop. Nâng plan → review trước khi commit.</li>
+              <li class="warn"><b>⚠ Cảnh giác:</b> AI hay nhận “xong” khi nửa vời → luôn tự verify (test/screenshot).</li>
               <li><b>→ Tận dụng:</b> mình hay debug bằng screenshot → đẩy mạnh Claude-in-Chrome / computer use.</li>
             </ul>
           </div>
@@ -541,8 +545,8 @@
         <h2>On the go — làm việc mọi nơi</h2>
       </div>
       <div class="cols-3 reveal" data-d="2">
-        <div class="card"><h3><span class="n">›</span> OpenClaw</h3><p>Mình cài OpenClaw → điều khiển dev qua <b>Telegram / điện thoại</b>. Conduct on the go.</p></div>
-        <div class="card"><h3><span class="n">›</span> CLI → API</h3><p>Expose <b>Claude CLI thành API</b>. Chậm hơn API trực tiếp (vì trick) nhưng đủ cho on-the-go.</p></div>
+        <div class="card"><h3><span class="n">›</span> OpenClaw</h3><p>Mình cài OpenClaw → điều khiển dev qua <b>Telegram / điện thoại</b>. Conduct on the go.</p><div style="margin-top:auto;display:flex;align-items:center;gap:11px;padding-top:14px"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwAQMAAAAEm3vRAAAABlBMVEX7+fIcGBOg4D+GAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAClElEQVRYhe2YzZGkMAyF5eLgo0NwJpAY1dDViUEmDsFHHyi078n0VM9sAKJ2xxcwHwf/SE/PFvlt/1gLiraJpFWOrGd66qvoFvnVHVeRuDW85SPHvUrS0vAFfX+8aNzQHfSQJumUGY+463ET3CZd+1gXzKSNN8LxTC/VgscpCzb6Jtj2e6rsYAJnWrP8FQ4+2LKkjelVLBQfeMGifk8iH3y1SYlVMYGl6Ck/2h0xJxa1jfg6lBb0qVjzySbqj9mNDFD8t+uzDoULri/1xpIo0Bw5kkgmU0WM/GtVHTHz27ozdhsbjaTKyCWMvLhj6LRyv4eClx0/zLkFKPch3pilV0S3BBXMMqIHlTyj1jn7YzMHY6/ACumxLLHa4owDhtg4cuo0/nqYOTCtcccYotIczHkoDMw6YFHx3yy3xygt0oJVQUrOJT31XQVdMQT7HQ4oIsye6SrYvhiqCOkxqTkkUno48haucHDF2Gg4BYvUbJGK/ecE1B/ju1WORW3kDEWIo15m0BMzv1HmuIgwB1zdnuhvPXfErMCNoWe1BJCGZfoMB0e8Yr/pS8vACDzTtdiL3hwHs1a614WKQ8cljNxP6fHCHDkEm2bQBPuReN78CAdHjMNv41mJwXD1dYfNEXfMRTXvwEjt3gFnYIxc1R+vrB1c20HNcXH3TXzccWXhNQtNVUxP/h7alznwxV0F7Qw0WhEBDO8C7YqHvt/MkrglE2zodp3dcW9dsHm3R8G2o9GiN8fXnQcj1RxXoDyecX/P2xPbTVHkcZziUx9I9G681B/b1Z8d6nIb+4PhsJS7YLswjTwDS9bLSd8CXzcFiEiWOVPF9QbYbiVDzxJFnmiJ/SbBHfcsmbqlmjCP7zbWEf+2/6n9AeE6d9MMPHG2AAAAAElFTkSuQmCC" alt="QR · OpenClaw guide" style="width:74px;height:74px;display:block;image-rendering:pixelated;border:1px solid var(--rule);background:#FBF9F2"><span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-soft);text-transform:uppercase;line-height:1.5">scan →<br>setup guide</span></div></div>
+        <div class="card"><h3><span class="n">›</span> CLI → API</h3><p>Biến <b>Claude CLI thành API endpoint</b> → gọi cho task AI in-app. Sợ burn token? <b>Lấy Claude ra chạy thử trước</b>. <span class="k">Cloudflare tunnel</span> → expose thành <b>domain public</b>, xài như API thật.</p></div>
         <div class="card"><h3><span class="n">›</span> Nhiều máy</h3><p>Mình chia <b>nhiều máy chạy song song</b> — Mac mini + Pi… — multitask thật.</p></div>
       </div>
     </section>
@@ -1110,7 +1114,7 @@
         <h1 class="reveal" data-d="2">Đừng chỉ dạy người dùng <span class="strike">AI giỏi hơn</span> —<br>hãy làm <span class="amber">codebase</span> để cả<br>người-kém-AI cũng <span class="amber">ship được consistent.</span></h1>
         <div class="reveal" data-d="4" style="display:flex;align-items:center;gap:16px;margin-top:30px;justify-content:center">
           <div style="background:#fff;padding:10px;border-radius:12px;line-height:0;box-shadow:0 6px 24px rgba(0,0,0,.35)">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwAQMAAAAEm3vRAAAABlBMVEX7+fIcGBOg4D+GAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABkElEQVRYhe2YPbKDMAyE5UlByRE4Ckezj8ZROAJlCsbKrmSHZPKK18qDCkj8QSG01o9Fbrvt07LSNlGRSfe1JD0nWzqjY16WLWtSPRYtks7pwFIKj20ZftNR3Cv8x2M6Cobf5m9OdSwsUh96yEqJDoKbUhnJGVux/i3kgNhzC/DjOSO3EP+mnoD4MmKR3/WgmH5TmQqlmv/S/A+PEUjh1sPv2cqcl72u1HExd6YWVMEn7/ZZgHu842IIF/76lkR5T/7/kkNULCZgGCO5WxUUBliiY1RBKrV4TkXqQXn/VGpYLAwgW2jrV7Zcqdj9+ixxsbBf6UXCFIoZQaRGx7n1K9rMly+lBsasBvDbFdse2vJXsQiJewNGhxdWOzzOzlOi46ZU34rKTtPW6+iYcUb1e/dryeOtZ3Dc42pDHoRsfiPu4XFuO7IJWPoUe70WFfPC8Ty5UlM7WPkeciPi94GKfil1GOxnemsrg6vqKNhOY9UUOvXaERu7UrP6uFrEc0uJj3tuaUOPtiFIouPbbvunvQD+kIZBMXqz1AAAAABJRU5ErkJggg==" alt="QR · git repo slide" style="width:120px;height:120px;display:block;image-rendering:pixelated">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwAQMAAAAEm3vRAAAABlBMVEX7+fIcGBOg4D+GAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABj0lEQVRYhe2YO47DMAxEKbhI6SP4KDmafDQfJUdwmcLQhEPSn8VmgW0pmEWU6DnFSCNStMgdd1yjgrEIRB6rPPX79rCpLTvmx7RUFLx1FCmbPsYhOy7AqtMUOr50WnWvE9ALVt3cyKWWJl1hkTYAr+eM78uSEIdTxfXOzY7iLyMnxJ5bFA/vUXW38i31JMRnDJpbMMtfkQ1TN50JdepK4+76s2NuJAfsDrUyt+xO7RbzhI40rlbBUQ1ty8FUJMmxCmUuhVfB5+yCz/1OiyunYfcWi8CQ7JhheuNk+kOnkdPicOqMGJvdOHEsS1oszKk2qlAtFiV0t/SYRWKi7gF+07SNPXSnxdWrQJXILaXFY1sHmD+pmz2CRI9w0Z0Uh0CEU1tx57b+8cOXA77PfkLrfgFPi/d99V7BWgfqR3pcQ6ftIFNQdLHn37JiftjN0st7Mcf+KO9JcbxQYTXES07H9oJtIyVyDF9e9oKtqzvuLdrUSnbsTvXyzosYu7pL954XR25BjHxpeS3vafEdd/wzPu4iepMgOVglAAAAAElFTkSuQmCC" alt="QR · git repo slide" style="width:120px;height:120px;display:block;image-rendering:pixelated">
           </div>
           <div style="text-align:left">
             <div style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.5px;text-transform:uppercase">Lấy slide này</div>
@@ -1168,10 +1172,7 @@
     else if(e.key==='Home'){ e.preventDefault(); show(0); }
     else if(e.key==='End'){ e.preventDefault(); show(total-1); }
   });
-  document.getElementById('deck').addEventListener('click', function(e){
-    var r=this.getBoundingClientRect();
-    if((e.clientX-r.left)>r.width*0.5) next(); else prev();
-  });
+  // click does NOT navigate (chỉ dùng phím ← / → / Space). QR/text click thoải mái.
   function fit(){
     var s=Math.min(window.innerWidth/1280, window.innerHeight/720);
     document.getElementById('deck').style.transform='scale('+s+')';
