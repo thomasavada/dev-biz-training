@@ -738,19 +738,17 @@
       </div>
       <div class="cols">
         <ul class="b reveal" data-d="2">
-          <li><b>1 loop đơn giản</b> (while) xử lý <b>từng ticket end-to-end</b> → thắng cả đống tool chain rườm rà.</li>
-          <li><b>Feedback loop là trái tim:</b> TDD (red→green) + <span class="k">synthetic loop</span> để test ở local, không chờ data production.</li>
-          <li><b>Tự cải thiện:</b> output tốt lên <b>mỗi vòng</b> mà không cần sửa prompt — loop tích lũy.</li>
+          <li><b>1 loop đơn giản</b> (while) xử lý <b>từng ticket end-to-end</b> → thắng tool chain rườm rà.</li>
+          <li><b>Feedback loop là trái tim:</b> TDD + <span class="k">synthetic loop</span> test ở local.</li>
+          <li><b>Tự cải thiện</b> mỗi vòng — loop tích lũy, không cần sửa prompt.</li>
+          <li><b>Validate + exit:</b> sub-agent “critic” chấm mỗi vòng · điều kiện dừng rõ · canh <span class="k">context rot</span>.</li>
+          <li><b>Tự động hóa:</b> worker/morning loop · <span class="k">/loop</span> (≈ plugin ralph-loop) → mỗi vòng ship 1 ticket.</li>
         </ul>
-        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;gap:16px">
-          <div class="card amber">
-            <h3>Validate + Exit</h3>
-            <p><b>Sub-agent “critic”</b> chấm mỗi vòng (= generator–evaluator) · <b>điều kiện dừng rõ</b> cho task mở · canh <span class="k">context rot</span> · vẫn review &amp; verify tay.</p>
+        <div class="reveal" data-d="3" style="display:flex;flex-direction:column;justify-content:center;gap:10px">
+          <div style="border:1px solid var(--rule);border-radius:4px;overflow:hidden;box-shadow:3px 4px 0 rgba(28,24,19,.12);background:#0E1116">
+            <img src="ralph-loop-example.png" alt="Ralph-style conformance loop — multi-agent fan-out fixes" style="width:100%;display:block">
           </div>
-          <div class="card">
-            <h3>Tự động hóa thật</h3>
-            <p><b>worker / morning loop</b> chạy nền định kỳ · <span class="k">/loop</span> command (≈ plugin <b>ralph-loop</b>) · gắn vào <b>ticket system</b> → mỗi vòng ship 1 ticket.</p>
-          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.03em;line-height:1.4">VÍ DỤ THẬT — conformance loop: <b style="color:var(--ink-soft)">audit → fan-out fix → commit → re-audit</b> · ≤5 vòng · 36/42 agents.</div>
         </div>
       </div>
     </section>
